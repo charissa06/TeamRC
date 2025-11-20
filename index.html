@@ -3,57 +3,123 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MatlishLearning🌸</title>
+  <title>MatlishLearning 🌸</title>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 
-<body class="season-spring">   <!-- HANYA BODY YANG INI SAJA -->
+<body class="season-spring">
 
-    <!-- Header -->
-    <header class="header">
-      <h1 class="logo">Mathlist<span>Learning</span></h1>
-    </header>
+  <div id="backgroundLayer" class="background-layer"></div>
 
-  <!-- Seasonal background selector -->
-  <div class="season-select">
-    <label>Pilih Musim: </label>
-    <select id="seasonSelect">
-      <option value="spring">Musim Semi</option>
-      <option value="summer">Musim Panas</option>
-      <option value="autumn">Musim Gugur</option>
-      <option value="winter">Musim Dingin</option>
-    </select>
-  </div>
-
-  <div class="container"></div>
-
-  <!-- Main menu -->
-  <main class="main-view" id="mainMenu">
-      ...
-  </main>
-
-  <!-- Quiz View -->
-  <section id="quizView" class="hidden">
-      ...
-  </section>
-
-  <!-- Result View -->
-  <section id="resultView" class="hidden card result-card">
-      ...
-  </section>
-
-  <!-- floating emoji feedback -->
+  <div id="seasonal" class="seasonal"></div>
   <div id="emojiFloat" class="emoji-float"></div>
 
-  <!-- seasonal decorations -->
-  <div id="seasonal" class="seasonal"></div>
+  <div class="container" id="app">
+    
+    <header class="header">
+      <h1 class="logo">Mathlist<span>Learning</span> 🎓</h1>
+      
+      <div class="season-wrapper">
+        <label>Pilih Musim:</label>
+        <select id="seasonSelect">
+          <option value="spring">🌸 Musim Semi</option>
+          <option value="summer">☀️ Musim Panas</option>
+          <option value="autumn">🍁 Musim Gugur</option>
+          <option value="winter">❄️ Musim Dingin</option>
+        </select>
+      </div>
+    </header>
+
+    <main class="card menu-card" id="mainMenu">
+      <h2>Mulai Belajar 👋</h2>
+      
+      <div class="field-row">
+        <label>Nama:</label>
+        <input type="text" id="nameInput" placeholder="Nama anak..." />
+      </div>
+      
+      <div class="field-row">
+        <label>Umur:</label>
+        <input type="number" id="ageInput" value="8" min="0" />
+      </div>
+
+      <div class="field-row">
+        <label>Kelas (1-6):</label>
+        <select id="gradeSelect">
+          <option value="1">Kelas 1</option>
+          <option value="2">Kelas 2</option>
+          <option value="3">Kelas 3</option>
+          <option value="4">Kelas 4</option>
+          <option value="5">Kelas 5</option>
+          <option value="6">Kelas 6</option>
+        </select>
+      </div>
+
+      <div class="field-row">
+        <label>Mata Pelajaran:</label>
+        <select id="subjectSelect">
+          <option value="math">Matematika</option>
+          <option value="english">Bahasa Inggris</option>
+        </select>
+      </div>
+
+      <div class="field-row">
+        <label>Level:</label>
+        <select id="levelSelect">
+          <option value="easy">Mudah</option>
+          <option value="medium">Sedang</option>
+          <option value="hard">Sulit</option>
+        </select>
+      </div>
+
+      <button id="startBtn" class="btn-primary">Mulai Quiz 🚀</button>
+      <p class="hint">Setiap soal bernilai 10 poin — total 10 soal (0-100). Jawaban salah mengurangi 5 poin.</p>
+    </main>
+
+    <section id="quizView" class="hidden">
+      <div class="quiz-header">
+        <div class="player-info">
+            <span id="playerNameDisplay">Nama Anak</span> | <span id="subjectDisplay">Matematika</span>
+        </div>
+        <div class="timer-badge">⏳ <span id="timer">30</span>s</div>
+        <div class="score-badge">Skor: <span id="score">0</span></div>
+      </div>
+
+      <div class="progressbar-bg">
+        <div class="progressbar-fill" id="progressFill"></div>
+      </div>
+
+      <div class="card question-card">
+        <small class="question-count-text">Soal <span id="currentQuestionNum">1</span>/<span id="totalQuestionsNum">10</span></small>
+        <div class="question-text" id="questionText">Siap?</div>
+        
+        <div id="answers" class="answers-grid">
+          </div>
+      </div>
+      
+      <div class="controls-row">
+        <button id="skipBtn" class="btn-small">Lewati ⏩</button>
+        <button id="quitBtn" class="btn-small btn-danger">Keluar ❌</button>
+      </div>
+    </section>
+
+    <section id="resultView" class="hidden card result-card">
+      <h1>Selesai! 🎉</h1>
+      <div class="final-score" id="finalScore">0</div>
+      <p id="resultMessage">Hebat sekali!</p>
+      <div class="btn-row-result">
+        <button id="retryBtn" class="btn-primary">Main Lagi 🔄</button>
+        <button id="homeBtn" class="btn-small">Ke Menu Utama 🏠</button>
+      </div>
+    </section>
+
+  </div>
 
   <footer class="footer">
     <small>Made with ❤️ for curious kids — DoodleLearning</small>
   </footer>
 
-<script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>
