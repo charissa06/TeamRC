@@ -1,1 +1,144 @@
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MatlishLearning🌸</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <h1 class="logo">Mathlist<span>Learning</span></h1>
+    </header>
 
+    <body class="season-spring">
+
+  <!-- Seasonal background selector -->
+  <div class="season-select">
+    <label>Pilih Musim: </label>
+    <select id="seasonSelect">
+      <option value="spring">Musim Semi</option>
+      <option value="summer">Musim Panas</option>
+      <option value="autumn">Musim Gugur</option>
+      <option value="winter">Musim Dingin</option>
+    </select>
+  </div>
+
+  <!-- Semua konten lain aplikasi -->
+  <div class="container">
+
+  </div>
+
+    <!-- Main menu -->
+    <main class="main-view" id="mainMenu">
+      <section class="card menu-card">
+        <h2>Mulai Belajar</h2>
+
+        <div class="field-row">
+          <label>Nama:</label>
+          <input id="nameInput" type="text" placeholder="Nama anak..." />
+        </div>
+
+        <div class="field-row">
+          <label>Umur:</label>
+          <input id="ageInput" type="number" min="7" max="12" value="0" />
+        </div>
+
+        <div class="field-row">
+          <label>Kelas (1-6):</label>
+          <select id="gradeSelect">
+            <option value="1">Kelas 1</option>
+            <option value="2">Kelas 2</option>
+            <option value="3">Kelas 3</option>
+            <option value="4">Kelas 4</option>
+            <option value="5">Kelas 5</option>
+            <option value="6">Kelas 6</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <label>Mata Pelajaran:</label>
+          <select id="subjectSelect">
+            <option value="math">Matematika</option>
+            <option value="english">Bahasa Inggris</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <label>Level:</label>
+          <select id="levelSelect">
+            <option value="easy">Mudah</option>
+            <option value="medium">Sedang</option>
+            <option value="hard">Sulit</option>
+          </select>
+        </div>
+
+        <div class="btn-row">
+          <button id="startBtn" class="start-btn">Mulai Quiz 🎯</button>
+        </div>
+
+        <p class="hint">Setiap soal bernilai 10 poin — total 10 soal (0–100). Jawaban salah mengurangi 5 poin.</p>
+      </section>
+    </main>
+
+    <!-- Quiz View -->
+    <section id="quizView" class="hidden">
+      <div class="quiz-header">
+
+        <div class="timer-box">
+  ⏳ <span id="timer">35</span> detik
+</div>
+
+        <div>
+          <strong id="playerName">Anak</strong> • <span id="playerGrade">Kelas 1</span> • <span id="playerSubject">Matematika</span>
+        </div>
+        <div class="scorebox">
+          Soal <span id="currentIndex">1</span>/10 • Skor: <span id="score">0</span>
+        </div>
+      </div>
+
+      <div class="question-card card">
+        <div id="questionText" class="question-text">Soal akan tampil di sini</div>
+        <div id="answers" class="answers-grid">
+          <!-- answer buttons -->
+        </div>
+        <div class="progressbar">
+          <div id="progressFill" class="progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="quiz-footer">
+        <button id="skipBtn" class="secondary">Lewati (ganti) ❯</button>
+        <button id="quitBtn" class="secondary">Kembali ke Menu</button>
+      </div>
+    </section>
+
+    <!-- Result View -->
+    <section id="resultView" class="hidden card result-card">
+      <h2>Hasil Quiz</h2>
+      <div class="result-score" id="finalScore">0 / 100</div>
+      <div id="resultMessage" class="result-message"></div>
+
+      <div class="btn-row">
+        <button id="retryBtn" class="start-btn">Coba Lagi (sama mata pelajaran)</button>
+        <button id="menuBtn" class="secondary">Kembali ke Menu</button>
+      </div>
+    </section>
+
+    <!-- floating emoji feedback -->
+    <div id="emojiFloat" class="emoji-float"></div>
+
+    <!-- seasonal decorations -->
+    <div id="seasonal" class="seasonal"></div>
+
+    <footer class="footer">
+      <small>Made with ❤️ for curious kids — DoodleLearning</small>
+    </footer>
+  </div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>           
