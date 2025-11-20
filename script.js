@@ -327,4 +327,4 @@ document.getElementById('skipBtn').addEventListener('click', () => {
     endGame();
   }
 });
-  perbaiki dan tambahkan soal setiap level ada soal yang berbeda beda dan memiliki kesulitan bertahap sesuai level setiap soal ber isi 4 jawaban dan setiap memulai harus ada 10 soal
+  
