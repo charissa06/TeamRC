@@ -1,632 +1,206 @@
-/* 🌈 Elevated Season Button (Premium Look) */
-.season-btn {
-  padding: 20px 14px;
-  border-radius: 20px;
-  border: none;
-  cursor: pointer;
-  backdrop-filter: blur(12px);
-  background: rgba(255, 255, 255, 0.45);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  font-size: 17px;
-  font-weight: 700;
-  transition: all 0.35s ease;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-  color: #4a4360;
-  padding-top: 16px;
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Comic+Neue:wght@700&display=swap');
+
+:root {
+  --primary: #ff9a9e;
+  --primary-dark: #ff7eb3;
+  --glass: rgba(255, 255, 255, 0.85);
+  --text: #2c3e50;
+  --radius: 20px;
 }
 
-/* SVG icon */
-.season-btn svg {
-  width: 40px;
-  height: 40px;
-  opacity: 0.85;
-  transition: all 0.35s ease;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Comic Neue', cursive; }
 
-/* Hover enlarge icon */
-.season-btn:hover svg {
-  transform: scale(1.15) rotate(6deg);
-  opacity: 1;
-}
-
-/* Active glowing */
-.season-btn.active {
-  transform: scale(1.07);
-  box-shadow: 0 14px 30px rgba(0,0,0,0.15);
-  color: white;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body, #app {
-  height: 100%;
-}
-
-/* 🩷 Body */
 body {
-  color: #1b1b2a;
-  padding: 28px;
-  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  padding: 20px;
+  color: var(--text);
+  background-color: #f0f0f0; /* Warna cadangan */
+  background-size: cover;
+  background-position: center;
   background-attachment: fixed;
-  overflow-x: hidden;
-  transition: background 0.6s ease-in-out;
+  /* Transisi body dihilangkan karena kita pakai background-layer */
+  overflow: hidden; /* Penting untuk mencegah scroll saat transisi */
+  position: relative; /* Penting untuk positioning background-layer */
 }
 
-/* 🌟 Header */
+/* Background Layer untuk Animasi */
+.background-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0; /* Pastikan di bawah konten utama */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  opacity: 1;
+  transition: opacity 1s ease-in-out; /* Animasi fade out */
+}
+
+.background-layer.fade-out {
+  opacity: 0;
+}
+
+/* --- BACKGROUND GAMBAR SESUAI FILE KAMU --- */
+/* Pastikan file gambar ada di folder yang sama dengan index.html */
+
+/* Musim Semi -> semi.jpg */
+body.season-spring .background-layer {
+  background-image: url('semi.jpg');
+}
+
+/* Musim Panas -> pans.jfif */
+body.season-summer .background-layer {
+  background-image: url('pans.jfif');
+}
+
+/* Musim Gugur -> ggr.jfif */
+body.season-autumn .background-layer {
+  background-image: url('ggr.jfif');
+}
+
+/* Musim Dingin -> dgin.jpg */
+body.season-winter .background-layer {
+  background-image: url('dgin.jpg');
+}
+
+
+/* --- Layout --- */
+.container { max-width: 600px; margin: 0 auto; position: relative; z-index: 2; }
+
+.hidden { display: none !important; }
+
+/* Header */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
-}
-
-.logo {
-  font-weight: 900;
-  font-size: 32px;
-  letter-spacing: -0.02em;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.logo span {
-  color: var(--accent);
-  font-size: 36px;
-}
-
-/* 🧒 Tambahkan emoji anak */
-.logo::after {
-  content: " 🎓✨";
-  font-size: 24px;
-  animation: floaty 3s ease-in-out infinite;
-}
-
-.controls {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-
-.card {
-  background: rgba(255, 255, 255, 0.45); /* transparan */
-  backdrop-filter: blur(12px);           /* efek kaca */
-  border-radius: var(--radius);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-  padding: 22px;
-  max-width: 880px;
-  margin: 0 auto;
-}
-
-.menu-card {
-  display: grid;
-  gap: 16px;
-  padding: 20px;
-  text-align: left;
-  background: rgba(255, 255, 255, 0.20); /* lebih tipis */
-  border-radius: 16px;
-  backdrop-filter: blur(6px);
-
-}
-
-.field-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-.field-row label {
-  min-width: 120px;
-  font-weight: 700;
-  color: var(--muted);
-  font-size: 16px;
-}
-.field-row input, .field-row select {
-  flex: 1;
-  padding: 12px;
-  border-radius: 12px;
-  border: 2px solid rgba(10, 20, 40, 0.06);
-  font-size: 16px;
-  background: #fff;
-}
-
-.hint {
-  font-size: 14px;
-  color: var(--muted);
-  margin-top: 6px;
-  font-style: italic;
-}
-
-/* 🧁 Buttons */
-.btn-row {
-  display: flex;
-  gap: 14px;
-  margin-top: 12px;
-}
-
-.start-btn {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  color: white;
-  padding: 12px 20px;
-  border-radius: 14px;
-  border: none;
-  cursor: pointer;
-  font-weight: 800;
-  font-size: 18px;
-  box-shadow: 0 8px 20px rgba(100, 100, 120, 0.12);
-  transition: all 0.3s ease;
-}
-.start-btn:hover {
-  transform: translateY(-4px) scale(1.05);
-}
-.start-btn::after {
-  content: " 🚀";
-}
-
-.secondary {
-  background: transparent;
-  border: 2px solid rgba(0, 0, 0, 0.1);
-  padding: 10px 16px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 16px;
-}
-
-/* 📚 Quiz View */
-.hidden { display: none; }
-
-.quiz-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 880px;
-  margin: 16px auto;
-}
-
-.scorebox {
+  margin-bottom: 20px;
   background: var(--glass);
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-weight: 700;
-  font-size: 18px;
+  padding: 10px 20px;
+  border-radius: 15px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.logo { font-family: 'Fredoka One', cursive; color: #444; font-size: 24px; }
+.logo span { color: var(--primary-dark); }
+
+.season-wrapper select {
+  padding: 5px; border-radius: 8px; border: 2px solid var(--primary);
+  font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.7);
 }
 
-.question-card {
-  max-width: 880px;
-  margin: 0 auto;
+/* Cards */
+.card {
+  background: var(--glass);
+  padding: 25px;
+  border-radius: var(--radius);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  border: 3px solid rgba(255,255,255,0.6);
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+/* Menu Card */
+.menu-card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  background: rgba(255, 255, 300, 0.45);  /* transparan */
-  backdrop-filter: blur(10px);            /* efek kaca */
-  padding: 18px;
-  border-radius: 18px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  gap: 15px;
 }
+.menu-card h2 { color: #333; margin-bottom: 10px; }
+.hint { font-size: 0.9em; color: #777; margin-top: 10px; font-style: italic; }
 
-.question-text {
-  color: #3a2f4f; 
-  font-size: 22px;
-  padding: 16px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.3); /* lebih soft */
-  backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  font-weight: 600;
+/* Inputs */
+.field-row {
+  display: flex; align-items: center; margin-bottom: 10px; /* Kurangi margin */
+  background: rgba(255,255,255,0.5); padding: 10px; border-radius: 12px;
 }
+.field-row label { width: 120px; font-weight: bold; text-align: left; } /* Lebarkan label */
+.field-row input, .field-row select {
+  flex: 1; padding: 8px; border: 2px solid transparent; border-radius: 8px; font-size: 16px;
+  background: rgba(255,255,255,0.8);
+}
+.field-row input:focus, .field-row select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 5px rgba(255,154,158,0.5); }
 
+/* Buttons */
+.btn-primary {
+  width: 100%; padding: 15px; font-size: 20px; font-weight: bold; color: white;
+  background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+  border: none; border-radius: 15px; cursor: pointer;
+  box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
+  transition: transform 0.2s;
+  margin-top: 15px; /* Tambah margin atas */
 }
-.answers-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-}
-.answers-grid button {
-  color: #3a2f4f;
-  padding: 14px;
-  border-radius: 14px;
-  border: 2px solid rgba(0, 0, 0, 0.05);
-  background: #fff;
-  font-weight: 700;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  min-height: 56px;
-}
-.answers-grid button:hover {
-  transform: translateY(-3px) scale(1.03);
-  background: var(--accent);
-  color: white;
-}
+.btn-primary:hover { transform: scale(1.03); }
 
-/* 📈 Progress */
-.progressbar {
-  height: 12px;
-  background: rgba(10, 20, 40, 0.05);
-  border-radius: 20px;
-  overflow: hidden;
+.btn-small {
+  padding: 8px 15px; border-radius: 10px; border: 2px solid #ccc; background: rgba(255,255,255,0.7); cursor: pointer; font-weight: bold; margin: 0 5px;
+  transition: background 0.2s, border-color 0.2s;
 }
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  width: 0%;
-}
+.btn-small:hover { background: #eee; border-color: #999; }
+.btn-danger { background: #ff6b6b; color: white; border-color: #ff6b6b; }
+.btn-danger:hover { background: #e05252; border-color: #e05252; }
 
-/* 🏁 Result */
-.result-card {
-  max-width: 480px;
-  margin: 30px auto;
-  text-align: center;
-  padding: 26px;
+/* Quiz UI */
+.quiz-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold;
+  background: rgba(255,255,255,0.7); padding: 10px 15px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-.result-score {
-  font-size: 54px;
-  font-weight: 900;
-  color: var(--accent);
-}
-.result-message {
-  margin-top: 14px;
-  color: var(--muted);
-  font-size: 18px;
-}
-.season-button-row {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-}
+.player-info { color: #555; font-size: 1.1em; }
+.score-badge { color: #27ae60; background: rgba(255,255,255,0.9); padding: 5px 10px; border-radius: 10px; }
+.timer-badge { color: #e67e22; background: rgba(255,255,255,0.9); padding: 5px 10px; border-radius: 10px; }
 
-/* 🌸 SPRING */
-body.season-spring {
-  background-image: url('semi.JPG');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-attachment: fixed;
-  background-size: cover;
-}
+.progressbar-bg { height: 10px; background: rgba(255,255,255,0.5); border-radius: 5px; overflow: hidden; margin-bottom: 20px; }
+.progressbar-fill { height: 100%; background: linear-gradient(90deg, #84fab0, #8fd3f4); width: 0%; transition: width 0.3s; }
 
-/* ☀️ SUMMER */
-body.season-summer {
-  background-image: url('pans.JFIF');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-attachment: fixed;
-  background-size: cover;
-}
-
-/* 🍂 AUTUMN */
-body.season-autumn {
-  background-image: url('ggr.JFIF');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-attachment: fixed;
-  background-size: cover;
-}
-
-/* ❄️ WINTER */
-body.season-winter {
-  background-image: url('dgin.JPG');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-attachment: fixed;
-  background-size: cover;
-}
-
-/* 🧩 Emoji Float */
-.emoji-float {
-  position: fixed;
-  right: 24px;
-  top: 120px;
-  pointer-events: none;
-  font-size: 48px;
-  z-index: 40;
-  animation: floaty 3s ease-in-out infinite;
-}
-
-/* 🍂 Seasonal */
-.seasonal {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: -1;
-}
-.seasonal .flake, .seasonal .leaf, .seasonal .petal, .seasonal .sunray {
-  position: absolute;
-  opacity: 0.9;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.06));
-}
-
-/* ✨ Animations */
-@keyframes fall {
-  0% { transform: translateY(-40vh) rotate(0deg); opacity: 0; }
-  10% { opacity: 1; }
-  100% { transform: translateY(120vh) rotate(360deg); opacity: 1; }
-}
-@keyframes floaty {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0); }
-}
-
-/* 📱 Responsive */
-@media (max-width: 720px) {
-  .answers-grid { grid-template-columns: 1fr; }
-  .field-row { flex-direction: column; align-items: flex-start; }
-  .field-row label { min-width: unset; }
-  .logo { font-size: 26px; }
-  .start-btn { font-size: 16px; }
-}
-
-
-/* 🌈✨ Hias Kolom-kolom Jadi Pink–Biru Soft */
-.menu-card,
-.card,
 .question-card {
-  border: 3px solid rgba(255, 182, 255, 0.35);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 230, 255, 0.55),
-    rgba(210, 235, 255, 0.45)
-  );
-  animation: softGlow 4s ease-in-out infinite alternate;
+  padding: 30px 25px; /* Tambah padding */
 }
+.question-count-text { display: block; margin-bottom: 10px; color: #777; font-size: 0.9em; }
+.question-text { font-size: 28px; margin: 15px 0; font-weight: bold; min-height: 70px; display: flex; align-items: center; justify-content: center; color: #333; }
 
-@keyframes softGlow {
-  from { box-shadow: 0 0 12px rgba(255,130,255,0.25); }
-  to { box-shadow: 0 0 22px rgba(150,200,255,0.35); }
-}
-
-/* 🎀 Input kolom juga pink–biru */
-.field-row input,
-.field-row select {
-  border: 2px solid rgba(255,160,255,0.4);
-  background: rgba(255,255,255,0.9);
-  box-shadow: 0 4px 12px rgba(160,200,255,0.15);
-}
-
-.field-row input:focus,
-.field-row select:focus {
-  border-color: #a2c8ff;
-  box-shadow: 0 0 14px rgba(150,200,255,0.55);
-}
-
-/* 🚀 Tombol Mulai jadi biru lembut */
-.start-btn {
-  background: linear-gradient(90deg, #7db9ff, #a2d2ff);
-}
-
-/* 📘 Kotak quiz diberi tampilan biru lembut */
-.quiz-header,
-.scorebox {
-  background: rgba(185, 215, 255, 0.55);
-  border: 2px solid rgba(140, 190, 255, 0.45);
-}
-
-/* 📚 Soal lurus ke bawah (1 kolom saja) */
-.answers-grid {
-  grid-template-columns: 1fr !important;
-}
-
-/* 🍬 Jawaban lebih gemes */
+.answers-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 20px; } /* Single column by default */
 .answers-grid button {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 235, 255, 0.9),
-    rgba(220, 240, 255, 0.9)
-  );
-  border: 2px solid rgba(255,180,255,0.35);
-  font-size: 18px;
-  border-radius: 16px;
+  padding: 15px; font-size: 18px; background: white; border: 3px solid #eee;
+  border-radius: 15px; cursor: pointer; font-weight: bold; color: #555;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
 }
+.answers-grid button:hover:not(:disabled) { background: #fdf2f5; border-color: var(--primary); transform: translateY(-3px); }
+.answers-grid button:disabled { opacity: 0.7; cursor: not-allowed; }
 
-/.answers-grid {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 14px !important;
-  width: 100%;
+.controls-row { text-align: right; margin-top: 20px; }
+
+/* Result */
+.result-card {
+  padding: 40px;
 }
+.final-score { font-size: 60px; font-weight: 900; color: var(--primary-dark); margin: 20px 0; text-shadow: 2px 2px 0px rgba(0,0,0,0.08); }
+.result-message { font-size: 20px; color: #555; margin-bottom: 30px; }
+.btn-row-result { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
 
 
-/* 🧸 Emoji otomatis untuk soal sesuai kata kunci */
-.question-text {
-  position: relative;
-  padding-left: 60px; /* ruang emoji */
-}
-
-/* Matematika → kalkulator */
-.question-text:before {
-  content: "🧮";
+/* Efek Jatuh (Daun/Salju) */
+.seasonal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+.falling-item {
   position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 32px;
+  animation: fall linear infinite;
+  opacity: 0.8;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
+}
+@keyframes fall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.8; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0.5; }
 }
 
-/* Jika berisi kata penjumlahan */
-.question-text[data-type="add"]:before { content: "➕✨"; }
-
-/* Jika pengurangan */
-.question-text[data-type="sub"]:before { content: "➖💫"; }
-
-/* Jika perkalian */
-.question-text[data-type="mul"]:before { content: "✖️⭐"; }
-
-/* Jika pembagian */
-.question-text[data-type="div"]:before { content: "➗🌈"; }
-
-
-/* 🌟 Kotak Judul "Doodle Learning" Biar Menonjol */
-.logo {
-  padding: 12px 20px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 20px rgba(150, 150, 200, 0.15);
-  border: 3px solid rgba(255, 180, 255, 0.35);
-
-  /* biar lebih menonjol */
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Tambahan efek glowing manis */
-.logo {
-  animation: logoGlow 3.5s ease-in-out infinite alternate;
-}
-
-@keyframes logoGlow {
-  from { box-shadow: 0 0 14px rgba(255,160,255,0.35); }
-  to { box-shadow: 0 0 28px rgba(160,200,255,0.45); }
-}
-
-
-/* 📦 Kotak untuk tombol Lewati – Ganti – Menu */
-.quiz-controls {
-  display: flex;
-  justify-content: center;
-  gap: 14px;
-  margin-top: 22px;
-}
-
-/* 🌈 Tombol berwarna lembut */
-./* 📦 Kotak tombol */
-.quiz-controls {
-  display: flex;
-  justify-content: center;
-  gap: 14px;
-  margin-top: 22px;
-}
-
-/* 🌈 Tombol warna kuat */
-.quiz-controls button {
-  padding: 12px 22px !important;
-  font-size: 17px !important;
-  font-weight: 800 !important;
-  border-radius: 16px !important;
-  border: none !important;
-  cursor: pointer !important;
-
-  /* 🎨 WARNA PAKSA AGAR MUNCUL */
-  background: linear-gradient(135deg, #ff4fd8, #45a3ff) !important;
-  color: white !important;
-
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.25) !important,
-    0 0 14px rgba(255, 150, 250, 0.75) !important;
-
-  transition: 0.25s ease !important;
-}
-
-/* Hover */
-.quiz-controls button:hover {
-  background: linear-gradient(135deg, #ff79ea, #7ac3ff) !important;
-  transform: translateY(-4px) scale(1.06) !important;
-  color: white !important;
-}
-
-/* Active */
-.quiz-controls button:active {
-  transform: scale(0.95) !important;
-}
-
-
-/* 🎨 Khusus tombol Lewati & Kembali ke Menu */
-.quiz-footer .secondary {
-  background: linear-gradient(135deg, #79a8ff, #ff9ce6);
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  font-weight: 700;
-  border-radius: 18px;
-  box-shadow: 0 6px 15px rgba(120, 80, 255, 0.25);
-  transition: 0.25s ease;
-}
-
-.quiz-footer .secondary:hover {
-  transform: translateY(-3px) scale(1.05);
-  background: linear-gradient(135deg, #5a8aff, #ff7ad9);
-  box-shadow: 0 10px 22px rgba(255, 120, 210, 0.35);
-}
-
-
-/* Jarak antara kartu soal dan tombol bawah */
-.quiz-footer {
-  margin-top: 35px;   /* tambah jarak di sini */
-  display: flex;
-  justify-content: center;
-  gap: 14px;
-}
-
-
-/* Dropdown Pilih Musim */
-.season-select label {
-  font-size: 18px;
-  font-weight: 700;
-  color: #6a78ff;
-}
-
-.season-select select {
-  padding: 10px 16px;
-  font-size: 17px;
-  border-radius: 14px;
-  border: 2px solid #a5b3ff;
-  background: linear-gradient(135deg, #79a8ff44, #ff9ce644);
-  color: #333;
-  font-weight: 600;
-  box-shadow: 0 6px 15px rgba(140, 130, 255, 0.15);
-  cursor: pointer;
-  transition: 0.25s ease;
-}
-
-.season-select select:hover {
-  transform: scale(1.04);
-  background: linear-gradient(135deg, #79a8ff66, #ff9ce666);
-}
-
-
-/* Membuat 4 jawaban tersusun lurus ke bawah */
-#answers {
-  display: flex;
-  flex-direction: column;   /* ← penting */
-  gap: 12px;                /* jarak antar jawaban */
-  width: 100%;
-  margin-top: 15px;
-}
-
-#answers button {
-  width: 100%;
-  text-align: left;
-  padding: 14px 18px;
-  font-size: 18px;
-  border-radius: 16px;
-  border: none;
-  background: #ffeaff;
-  cursor: pointer;
-  transition: 0.2s ease;
-  font-weight: 600;
-}
-
-#answers button:hover {
-  transform: scale(1.02);
-}
-
-
-.timer-box {
-  font-family: 'Fredoka One', cursive;
-  font-size: 28px;
-  color: #ff4eb8;
-  background: #ffe6f5;
-  padding: 8px 14px;
-  border-radius: 15px;
-  display: inline-block;
-  margin-top: 10px;
-  box-shadow: 0 0 8px rgba(255, 94, 204, 0.4);
+/* Responsive */
+@media (max-width: 500px) {
+  .answers-grid { grid-template-columns: 1fr; }
+  .header { flex-direction: column; gap: 10px; }
+  .field-row { flex-direction: column; align-items: flex-start; }
+  .field-row label { width: 100%; margin-bottom: 5px; }
+  .question-text { font-size: 22px; min-height: 50px; }
+  .btn-primary { font-size: 18px; padding: 12px; }
+  .btn-row-result { flex-direction: column; }
 }
