@@ -21,19 +21,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  if (musicToggle) {
-    musicToggle.addEventListener('click', () => {
-      musicOn = !musicOn;
-      if (!bgMusic) return;
-      if (musicOn) {
-        bgMusic.play();
-        musicToggle.textContent = "🔊 Musik: ON";
-      } else {
-        bgMusic.pause();
-        musicToggle.textContent = "🔇 Musik: OFF";
-      }
-    });
+const bgm = document.getElementById("backsound");
+const toggleBtn = document.getElementById("musicToggle");
+
+toggleBtn.addEventListener("click", () => {
+  if (bgm.paused) {
+    bgm.play();
+    toggleBtn.textContent = "🔊 Musik: ON";
+  } else {
+    bgm.pause();
+    toggleBtn.textContent = "🔇 Musik: OFF";
   }
+});
 
   /* =========================
      ELEMENT REFERENCES (DOM)
