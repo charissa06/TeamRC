@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Comic+Neue:wght@700&display=swap');
 
+/* =========================================================
+   ROOT VARIABLES
+   ========================================================= */
 :root {
   --primary: #ff9a9e;
   --primary-dark: #ff7eb3;
@@ -8,193 +11,403 @@
   --radius: 20px;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Comic Neue', cursive; }
+/* =========================================================
+   RESET & GLOBAL
+   ========================================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Comic Neue', cursive;
+}
 
 body {
   min-height: 100vh;
   padding: 20px;
   color: var(--text);
-  background-color: #f0f0f0; /* Warna cadangan */
+  background-color: #f0f0f0;
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
-  /* Transisi body dihilangkan karena kita pakai background-layer */
-  overflow: hidden; /* Penting untuk mencegah scroll saat transisi */
-  position: relative; /* Penting untuk positioning background-layer */
+  overflow: hidden;
+  position: relative;
 }
 
-/* Background Layer untuk Animasi */
+/* =========================================================
+   BACKGROUND LAYER
+   ========================================================= */
 .background-layer {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 0; /* Pastikan di bawah konten utama */
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   opacity: 1;
-  transition: opacity 1s ease-in-out; /* Animasi fade out */
+  z-index: 0;
+  transition: opacity 1s ease-in-out;
 }
 
 .background-layer.fade-out {
   opacity: 0;
 }
 
-/* --- BACKGROUND GAMBAR SESUAI FILE KAMU --- */
-/* Pastikan file gambar ada di folder yang sama dengan index.html */
+/* Seasonal Backgrounds */
+body.season-spring .background-layer { background-image: url('semi.jpg'); }
+body.season-summer .background-layer { background-image: url('pans.jfif'); }
+body.season-autumn .background-layer { background-image: url('ggr.jfif'); }
+body.season-winter .background-layer { background-image: url('dingin.jfif'); }
 
-/* Musim Semi -> semi.jpg */
-body.season-spring .background-layer {
-  background-image: url('semi.jpg');
+/* =========================================================
+   LAYOUT
+   ========================================================= */
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
 }
 
-/* Musim Panas -> pans.jfif */
-body.season-summer .background-layer {
-  background-image: url('pans.jfif');
+.hidden {
+  display: none !important;
 }
 
-/* Musim Gugur -> ggr.jfif */
-body.season-autumn .background-layer {
-  background-image: url('ggr.jfif');
-}
-
-/* Musim Dingin -> dgin.jpg */
-body.season-winter .background-layer {
-  background-image: url('dgin.jpg');
-}
-
-
-/* --- Layout --- */
-.container { max-width: 600px; margin: 0 auto; position: relative; z-index: 2; }
-
-.hidden { display: none !important; }
-
-/* Header */
+/* =========================================================
+   HEADER
+   ========================================================= */
 .header {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9998;
+
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  background: var(--glass);
+  flex-direction: column;   /* ⬅️ INI YANG MEMBUAT “Pilih Musim” TURUN KE BAWAH */
+  align-items: flex-start;
+  gap: 10px;
+
   padding: 10px 20px;
+  background: var(--glass);
   border-radius: 15px;
   backdrop-filter: blur(5px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
-.logo { font-family: 'Fredoka One', cursive; color: #444; font-size: 24px; }
-.logo span { color: var(--primary-dark); }
+
+
+
+.logo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 24px;
+  color: #444;
+}
+
+.logo span {
+  color: var(--primary-dark);
+}
 
 .season-wrapper select {
-  padding: 5px; border-radius: 8px; border: 2px solid var(--primary);
-  font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.7);
+  padding: 5px;
+  border-radius: 8px;
+  border: 2px solid var(--primary);
+  font-weight: bold;
+  cursor: pointer;
+  background: rgba(255,255,255,0.7);
 }
 
-/* Cards */
+/* =========================================================
+   BACKSOUND BUTTON
+   ========================================================= */
+/* === POSISI TOMBOL MUSIK — ATAS KANAN === */
+#musicControl {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+#musicBtn {
+  background: #ffb7f5;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  font-family: 'Comic Neue';
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  white-space: nowrap;
+}
+
+#musicBtn:hover {
+  background: #ff9ae8;
+}
+
+/* =========================================================
+   CARDS
+   ========================================================= */
 .card {
-  background: var(--glass);
   padding: 25px;
-  border-radius: var(--radius);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  background: var(--glass);
   border: 3px solid rgba(255,255,255,0.6);
-  text-align: center;
+  border-radius: var(--radius);
   backdrop-filter: blur(10px);
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
-/* Menu Card */
 .menu-card {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
-.menu-card h2 { color: #333; margin-bottom: 10px; }
-.hint { font-size: 0.9em; color: #777; margin-top: 10px; font-style: italic; }
 
-/* Inputs */
-.field-row {
-  display: flex; align-items: center; margin-bottom: 10px; /* Kurangi margin */
-  background: rgba(255,255,255,0.5); padding: 10px; border-radius: 12px;
+.menu-card h2 {
+  color: #333;
+  margin-bottom: 10px;
 }
-.field-row label { width: 120px; font-weight: bold; text-align: left; } /* Lebarkan label */
-.field-row input, .field-row select {
-  flex: 1; padding: 8px; border: 2px solid transparent; border-radius: 8px; font-size: 16px;
+
+.hint {
+  margin-top: 10px;
+  color: #777;
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+.field-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 12px;
+}
+
+.field-row label {
+  width: 120px;
+  font-weight: bold;
+  text-align: left;
+}
+
+.field-row input,
+.field-row select {
+  flex: 1;
+  padding: 8px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font-size: 16px;
   background: rgba(255,255,255,0.8);
 }
-.field-row input:focus, .field-row select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 5px rgba(255,154,158,0.5); }
 
-/* Buttons */
-.btn-primary {
-  width: 100%; padding: 15px; font-size: 20px; font-weight: bold; color: white;
-  background: linear-gradient(45deg, #ff9a9e, #fad0c4);
-  border: none; border-radius: 15px; cursor: pointer;
-  box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
-  transition: transform 0.2s;
-  margin-top: 15px; /* Tambah margin atas */
+.field-row input:focus,
+.field-row select:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 5px rgba(255,154,158,0.5);
 }
-.btn-primary:hover { transform: scale(1.03); }
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+.btn-primary {
+  width: 100%;
+  padding: 15px;
+  margin-top: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(255,154,158,0.4);
+  transition: transform 0.2s;
+}
+
+.btn-primary:hover {
+  transform: scale(1.03);
+}
 
 .btn-small {
-  padding: 8px 15px; border-radius: 10px; border: 2px solid #ccc; background: rgba(255,255,255,0.7); cursor: pointer; font-weight: bold; margin: 0 5px;
-  transition: background 0.2s, border-color 0.2s;
+  padding: 8px 15px;
+  margin: 0 5px;
+  font-weight: bold;
+  background: rgba(255,255,255,0.7);
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
 }
-.btn-small:hover { background: #eee; border-color: #999; }
-.btn-danger { background: #ff6b6b; color: white; border-color: #ff6b6b; }
-.btn-danger:hover { background: #e05252; border-color: #e05252; }
 
-/* Quiz UI */
-.quiz-header {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold;
-  background: rgba(255,255,255,0.7); padding: 10px 15px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+.btn-small:hover {
+  background: #eee;
+  border-color: #999;
 }
-.player-info { color: #555; font-size: 1.1em; }
+
+.btn-danger {
+  background: #ff6b6b;
+  color: white;
+  border-color: #ff6b6b;
+}
+
+.btn-danger:hover {
+  background: #e05252;
+  border-color: #e05252;
+}
+
+/* =========================================================
+   QUIZ HEADER
+   ========================================================= */
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  font-weight: bold;
+}
+
+.player-info { color: #555; }
 .score-badge { color: #27ae60; background: rgba(255,255,255,0.9); padding: 5px 10px; border-radius: 10px; }
 .timer-badge { color: #e67e22; background: rgba(255,255,255,0.9); padding: 5px 10px; border-radius: 10px; }
 
-.progressbar-bg { height: 10px; background: rgba(255,255,255,0.5); border-radius: 5px; overflow: hidden; margin-bottom: 20px; }
-.progressbar-fill { height: 100%; background: linear-gradient(90deg, #84fab0, #8fd3f4); width: 0%; transition: width 0.3s; }
-
-.question-card {
-  padding: 30px 25px; /* Tambah padding */
+/* =========================================================
+   PROGRESS BAR
+   ========================================================= */
+.progressbar-bg {
+  height: 10px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 20px;
 }
-.question-count-text { display: block; margin-bottom: 10px; color: #777; font-size: 0.9em; }
-.question-text { font-size: 28px; margin: 15px 0; font-weight: bold; min-height: 70px; display: flex; align-items: center; justify-content: center; color: #333; }
 
-.answers-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 20px; } /* Single column by default */
+.progressbar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #84fab0, #8fd3f4);
+  transition: width 0.3s;
+}
+
+/* =========================================================
+   QUESTIONS & ANSWERS
+   ========================================================= */
+.question-card { padding: 30px 25px; }
+
+.question-count-text {
+  margin-bottom: 10px;
+  display: block;
+  color: #777;
+  font-size: 0.9em;
+}
+
+.question-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70px;
+  margin: 15px 0;
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+}
+
+.answers-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+
 .answers-grid button {
-  padding: 15px; font-size: 18px; background: white; border: 3px solid #eee;
-  border-radius: 15px; cursor: pointer; font-weight: bold; color: #555;
-  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  padding: 15px;
+  font-size: 18px;
+  font-weight: bold;
+  background: white;
+  border: 3px solid #eee;
+  border-radius: 15px;
+  cursor: pointer;
+  color: #555;
+  transition: 0.2s;
 }
-.answers-grid button:hover:not(:disabled) { background: #fdf2f5; border-color: var(--primary); transform: translateY(-3px); }
-.answers-grid button:disabled { opacity: 0.7; cursor: not-allowed; }
 
-.controls-row { text-align: right; margin-top: 20px; }
-
-/* Result */
-.result-card {
-  padding: 40px;
+.answers-grid button:hover:not(:disabled) {
+  background: #fdf2f5;
+  border-color: var(--primary);
+  transform: translateY(-3px);
 }
-.final-score { font-size: 60px; font-weight: 900; color: var(--primary-dark); margin: 20px 0; text-shadow: 2px 2px 0px rgba(0,0,0,0.08); }
-.result-message { font-size: 20px; color: #555; margin-bottom: 30px; }
-.btn-row-result { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
 
+.answers-grid button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
 
-/* Efek Jatuh (Daun/Salju) */
-.seasonal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+.controls-row {
+  margin-top: 20px;
+  text-align: right;
+}
+
+/* =========================================================
+   RESULT VIEW
+   ========================================================= */
+.result-card { padding: 40px; }
+
+.final-score {
+  margin: 20px 0;
+  font-size: 60px;
+  font-weight: 900;
+  color: var(--primary-dark);
+  text-shadow: 2px 2px rgba(0,0,0,0.08);
+}
+
+.result-message {
+  margin-bottom: 30px;
+  font-size: 20px;
+  color: #555;
+}
+
+.btn-row-result {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+/* =========================================================
+   FALLING EFFECTS (DAUN/SALJU)
+   ========================================================= */
+.seasonal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
 .falling-item {
   position: absolute;
-  animation: fall linear infinite;
   opacity: 0.8;
+  animation: fall linear infinite;
   filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
 }
+
 @keyframes fall {
-  0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
-  10% { opacity: 0.8; }
+  0%   { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.8; }
   100% { transform: translateY(110vh) rotate(360deg); opacity: 0.5; }
 }
 
-/* Responsive */
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
 @media (max-width: 500px) {
   .answers-grid { grid-template-columns: 1fr; }
   .header { flex-direction: column; gap: 10px; }
