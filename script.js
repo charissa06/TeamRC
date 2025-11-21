@@ -1,574 +1,650 @@
-/* --- PENTING: Pembungkus DOMContentLoaded --- */
-// Ini memastikan bahwa semua elemen HTML (tombol, div, input) sudah dimuat
-// dan tersedia di Document Object Model (DOM) sebelum JavaScript mencoba
-// untuk mencari elemen tersebut menggunakan getElementById dan melampirkan event listener.
+// ======================
+// PART A — LOGIKA UTAMA KUIS (letakkan di bagian atas file)
+// ======================
+
+// Pastikan bagian B + C (englishQuestions) diletakkan setelah bagian ini.
 document.addEventListener('DOMContentLoaded', () => {
 
-    /* --- LOGIKA BACKGROUND & MUSIM --- */
-    const seasonSelect = document.getElementById('seasonSelect');
-    const seasonalContainer = document.getElementById('seasonal');
-    const backgroundLayer = document.getElementById('backgroundLayer'); 
+  /* =========================
+     BACKSOUND MUSIK
+     ========================= */
+  const bgMusic = document.getElementById('bgMusic');
+  const musicToggle = document.getElementById('musicToggle');
+  let musicOn = true;
 
-    // Daftar emoji jatuh sesuai musim
-    const seasonEmojis = {
-        spring: ['🌸', '🌹', '🌷', '🐝'],
-        summer: ['☀️', '🌻', '🍦', '🌊'],
-        autumn: ['🍁', '🍂', '🍄', '🌰'],
-        winter: ['❄️', '⛄', '🧊', '🧤']
-    };
+  if (bgMusic) bgMusic.volume = 0.3;
 
-    // Fungsi untuk transisi background
-    function transitionSeasonBackground(newSeason) {
-        const currentBodyClass = document.body.className;
-        
-        // Jika ini bukan perubahan pertama, fade out background lama
-        if (currentBodyClass) {
-            backgroundLayer.classList.add('fade-out'); // Mulai fade out
-            // Mengambil nama musim lama dari body class
-            const oldSeason = currentBodyClass.includes('season-') ? currentBodyClass.replace('season-', '') : '';
-            backgroundLayer.style.backgroundImage = getSeasonImageUrl(oldSeason);
+  window.addEventListener('load', () => {
+    if (!bgMusic) return;
+    bgMusic.play().catch(() => {
+      console.log("Autoplay diblokir. User harus tekan tombol untuk play.");
+    });
+  });
+
+  if (musicToggle) {
+    musicToggle.addEventListener('click', () => {
+      musicOn = !musicOn;
+      if (!bgMusic) return;
+      if (musicOn) {
+        bgMusic.play();
+        musicToggle.textContent = "🔊 Musik: ON";
+      } else {
+        bgMusic.pause();
+        musicToggle.textContent = "🔇 Musik: OFF";
+      }
+    });
+  }
+
+  /* =========================
+     ELEMENT REFERENCES (DOM)
+  */
+  const seasonSelect = document.getElementById('seasonSelect');
+  const seasonalContainer = document.getElementById('seasonal');
+  const backgroundLayer = document.getElementById('backgroundLayer');
+
+  const mainMenu = document.getElementById('mainMenu');
+  const quizView = document.getElementById('quizView');
+  const resultView = document.getElementById('resultView');
+  const questionText = document.getElementById('questionText');
+  const answersEl = document.getElementById('answers');
+  const scoreEl = document.getElementById('score');
+  const timerEl = document.getElementById('timer');
+  const progressFill = document.getElementById('progressFill');
+  const playerNameDisplay = document.getElementById('playerNameDisplay');
+  const subjectDisplay = document.getElementById('subjectDisplay');
+  const currentQuestionNum = document.getElementById('currentQuestionNum');
+  const totalQuestionsNum = document.getElementById('totalQuestionsNum');
+  const finalScoreEl = document.getElementById('finalScore');
+  const resultMessageEl = document.getElementById('resultMessage');
+
+  const startBtn = document.getElementById('startBtn');
+  const quitBtn = document.getElementById('quitBtn');
+  const homeBtn = document.getElementById('homeBtn');
+  const retryBtn = document.getElementById('retryBtn');
+  const skipBtn = document.getElementById('skipBtn');
+
+  const nameInput = document.getElementById('nameInput');
+  const ageInput = document.getElementById('ageInput');
+  const gradeSelect = document.getElementById('gradeSelect');
+  const subjectSelect = document.getElementById('subjectSelect');
+  const levelSelect = document.getElementById('levelSelect');
+
+  function ensure(el, id) {
+    if (!el) console.warn(`Element with id="${id}" not found in DOM.`);
+    return !!el;
+  }
+
+  ensure(mainMenu, 'mainMenu');
+  ensure(startBtn, 'startBtn');
+  ensure(nameInput, 'nameInput');
+  ensure(ageInput, 'ageInput');
+  ensure(gradeSelect, 'gradeSelect');
+  ensure(subjectSelect, 'subjectSelect');
+  ensure(levelSelect, 'levelSelect');
+
+  /* =========================
+     MUSIM & BACKGROUND
+  */
+  const seasonEmojis = {
+    spring: ['🌸', '🌷'],
+    summer: ['🌻', '🍦', '🌊'],
+    autumn: ['🍁', '🍂', '🍄'],
+    winter: ['❄️', '⛄']
+  };
+
+  function getSeasonImageUrl(season) {
+    switch (season) {
+      case 'spring': return 'url("semi.jpg")';
+      case 'summer': return 'url("pans.jfif")';
+      case 'autumn': return 'url("ggr.jfif")';
+      case 'winter': return 'url("dingin.jfif")';
+      default: return 'none';
+    }
+  }
+
+  function transitionSeasonBackground(newSeason) {
+    if (!backgroundLayer) return;
+    Array.from(document.body.classList)
+      .filter(c => c.startsWith('season-'))
+      .forEach(c => document.body.classList.remove(c));
+    backgroundLayer.style.backgroundImage = getSeasonImageUrl(newSeason);
+  }
+
+  function createFallingEffect(season) {
+    if (!seasonalContainer) return;
+    seasonalContainer.innerHTML = '';
+    const emojis = seasonEmojis[season] || seasonEmojis.spring;
+    const count = 15;
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = 'falling-item';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.fontSize = (Math.random() * 20 + 20) + 'px';
+      el.style.animationDuration = (Math.random() * 5 + 5) + 's';
+      el.style.animationDelay = Math.random() * 5 + 's';
+      el.style.top = -10 - Math.random() * 20 + 'vh';
+      seasonalContainer.appendChild(el);
+    }
+  }
+
+  function changeSeason(season) {
+    transitionSeasonBackground(season);
+    createFallingEffect(season);
+    document.body.classList.remove('season-spring','season-summer','season-autumn','season-winter');
+    document.body.classList.add('season-' + season);
+  }
+
+  if (seasonSelect) seasonSelect.addEventListener('change', e => changeSeason(e.target.value));
+  changeSeason('spring');
+
+  /* =========================
+     POOL SOAL MATEMATIKA (tetap random)
+  */
+  window.mathPoolRef = window.mathPoolRef || {
+    easy: () => {
+      const a = Math.floor(Math.random() * 10) + 1;
+      const b = Math.floor(Math.random() * 10) + 1;
+      return { q: `${a} + ${b} = ?`, a: a + b, opts: [] };
+    },
+    medium: () => {
+      const a = Math.floor(Math.random() * 50) + 10;
+      const b = Math.floor(Math.random() * 10) + 1;
+      return { q: `${a} - ${b} = ?`, a: a - b, opts: [] };
+    },
+    hard: () => {
+      const a = Math.floor(Math.random() * 12) + 1;
+      const b = Math.floor(Math.random() * 12) + 1;
+      return { q: `${a} × ${b} = ?`, a: a * b, opts: [] };
+    }
+  };
+
+  /* =========================
+     STATE KUIS
+  */
+  let state = {
+    name: 'Anak',
+    age: 8,
+    grade: 1,
+    subject: 'math', // 'math' atau 'english'
+    level: 'easy', // 'easy' | 'medium' | 'hard'
+    score: 0,
+    currentQ: 0,
+    totalQ: 10,
+    perQuestion: 10,
+    wrongPenalty: 5,
+    timeLeft: 30,
+    timerId: null,
+    questions: []
+  };
+
+  function shuffleArray(arr) {
+    for (let i = arr.length-1; i > 0; i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function generateRandomValidishWord(len){
+    const vowels='aeiou', cons='bcdfghjklmnpqrstvwxyz';
+    let s='', isV=Math.random()<0.5;
+    for(let i=0;i<len;i++){
+      s += isV ? vowels[Math.floor(Math.random()*vowels.length)] : cons[Math.floor(Math.random()*cons.length)];
+      isV = !isV;
+    }
+    return s.charAt(0).toUpperCase()+s.slice(1);
+  }
+
+  function getRandomWordType(type){
+    const subjects=['She','He','They','It','A dog','The car','The girl','My teacher','We','You'];
+    const verbs=['jump','run','eat','sleep','talk','read','sing','drive','play','walk','see'];
+    const objects=['ball','house','book','food','tree','movie','car','garden','phone','friend','school'];
+    if(type === 'filler') return generateRandomValidishWord(4);
+    const map = {subject:subjects, verb:verbs, object:objects};
+    const list = map[type] || objects;
+    return list[Math.floor(Math.random()*list.length)];
+  }
+
+  /* =========================
+     GENERATE QUESTIONS (MATH random OR ENGLISH bank)
+     - englishQuestions must be defined in PART B/C
+  */
+  function generateQuestions(grade, subject, level, total){
+    const questions = [];
+
+    if (subject === 'math') {
+      const pool = window.mathPoolRef[level] || window.mathPoolRef.easy;
+      for (let i=0;i<total;i++){
+        const qObj = pool();
+        let options = qObj.opts || [];
+        if (options.length === 0) options.push(String(qObj.a));
+        while (options.length < 4) {
+          let d = Number(qObj.a) + Math.floor(Math.random()*11) - 5;
+          if (!options.includes(String(d))) options.push(String(d));
         }
-
-        // Setelah fade out selesai (atau segera jika ini yang pertama), ganti background dan fade in
-        setTimeout(() => {
-            // Hapus kelas musim lama dari body dan tambahkan yang baru
-            document.body.className = '';
-            document.body.classList.add('season-' + newSeason);
-            
-            // Set background image baru untuk backgroundLayer dan fade in
-            backgroundLayer.style.backgroundImage = getSeasonImageUrl(newSeason);
-            backgroundLayer.classList.remove('fade-out'); // Fade in
-        }, 500); // Durasi transisi CSS (0.5s)
+        questions.push({ q: qObj.q, a: String(qObj.a), opts: shuffleArray(options.map(String)) });
+      }
+      return questions;
     }
 
-    // Helper untuk mendapatkan URL gambar berdasarkan musim
-    function getSeasonImageUrl(season) {
-        switch(season) {
-            case 'spring': return 'url("semi.jpg")';
-            case 'summer': return 'url("pans.jfif")';
-            case 'autumn': return 'url("ggr.jfif")';
-            case 'winter': return 'url("dgin.jpg")';
-            default: return 'none';
-        }
-    }
+    // ENGLISH: use englishQuestions defined in PART B/C
+    if (subject === 'english') {
+      // map level names
+      const lvlMap = { easy: 'mudah', medium: 'sedang', hard: 'sulit' };
+      const lvlKey = lvlMap[level] || 'mudah';
+      const kelasKey = 'kelas' + Number(grade);
+      const bank = (typeof englishQuestions !== 'undefined' && englishQuestions[kelasKey] && englishQuestions[kelasKey][lvlKey]) ? englishQuestions[kelasKey][lvlKey] : [];
 
-    // Fungsi ganti background & efek (memanggil transitionSeasonBackground)
-    function changeSeason(season) {
-        transitionSeasonBackground(season); // Menggunakan fungsi transisi baru
-        createFallingEffect(season);
-    }
-
-    function createFallingEffect(season) {
-        seasonalContainer.innerHTML = ''; // bersihkan efek lama
-        const emojis = seasonEmojis[season];
-        const count = 15; // jumlah item jatuh
-
-        for(let i=0; i<count; i++) {
-            const el = document.createElement('div');
-            el.className = 'falling-item';
-            el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-            el.style.left = Math.random() * 100 + 'vw';
-            el.style.fontSize = (Math.random() * 20 + 20) + 'px';
-            el.style.animationDuration = (Math.random() * 5 + 5) + 's'; // kecepatan 5-10 detik
-            el.style.animationDelay = Math.random() * 5 + 's';
-            el.style.top = -10 - Math.random() * 20 + 'vh'; // Mulai dari atas layar
-            seasonalContainer.appendChild(el);
-        }
-    }
-
-    // Event Listener saat dropdown berubah
-    if (seasonSelect) {
-        seasonSelect.addEventListener('change', (e) => {
-            changeSeason(e.target.value);
-        });
-    }
-
-    // Jalankan saat pertama kali load
-    changeSeason('spring');
-
-
-    /* --- LOGIKA KUIS (GAME) --- */
-    let state = {
-        name: 'Anak',
-        age: 8,
-        grade: 1,
-        subject: 'math',
-        level: 'easy',
-        score: 0,
-        currentQ: 0,
-        totalQ: 10, // Mengubah totalQ menjadi 10
-        perQuestion: 10,
-        wrongPenalty: 5,
-        timeLeft: 30,
-        timerId: null,
-        questions: []
-    };
-
-    // DOM Elements
-    const mainMenu = document.getElementById('mainMenu');
-    const quizView = document.getElementById('quizView');
-    const resultView = document.getElementById('resultView');
-    const questionText = document.getElementById('questionText');
-    const answersEl = document.getElementById('answers');
-    const scoreEl = document.getElementById('score');
-    const timerEl = document.getElementById('timer');
-    const progressFill = document.getElementById('progressFill');
-    const playerNameDisplay = document.getElementById('playerNameDisplay');
-    const subjectDisplay = document.getElementById('subjectDisplay');
-    const currentQuestionNum = document.getElementById('currentQuestionNum');
-    const totalQuestionsNum = document.getElementById('totalQuestionsNum');
-    const finalScoreEl = document.getElementById('finalScore');
-    const resultMessageEl = document.getElementById('resultMessage');
-    
-    // Ambil elemen tombol navigasi secara eksplisit
-    const startBtn = document.getElementById('startBtn');
-    const quitBtn = document.getElementById('quitBtn');
-    const homeBtn = document.getElementById('homeBtn');
-    const retryBtn = document.getElementById('retryBtn');
-    const skipBtn = document.getElementById('skipBtn');
-
-
-    /**
-     * UTILITY: Fungsi untuk menghasilkan kata acak yang terlihat seperti kata kerja atau kata benda.
-     */
-    function generateRandomValidishWord(length) {
-        // Kombinasi vokal dan konsonan yang lebih baik untuk kata yang "bisa dibaca"
-        const vowels = 'aeiou';
-        const consonants = 'bcdfghjklmnpqrstvwxyz';
-        let result = '';
-        let isVowel = Math.random() < 0.5;
-        
-        for (let i = 0; i < length; i++) {
-            if (isVowel) {
-                result += vowels.charAt(Math.floor(Math.random() * vowels.length));
-            } else {
-                result += consonants.charAt(Math.floor(Math.random() * consonants.length));
-            }
-            isVowel = !isVowel; // Pergantian konsonan-vokal
-        }
-        // Kapitalisasi huruf pertama
-        return result.charAt(0).toUpperCase() + result.slice(1);
-    }
-
-    /**
-     * UTILITY: Fungsi untuk menghasilkan salah satu pilihan acak dari daftar kata dasar yang umum (tanpa database kosa kata spesifik)
-     */
-    function getRandomWordType(type) {
-        // Kata-kata ini hanya untuk KATEGORI tata bahasa (Verb, Noun, Adj), BUKAN kosa kata
-        const subjects = ['She', 'He', 'They', 'It', 'A_dog', 'The_car', 'The_girl', 'My_teacher', 'We', 'You'];
-        const verbs = ['jump', 'run', 'eat', 'sleep', 'talk', 'read', 'sing', 'drive', 'play', 'walk', 'see'];
-        const objects = ['ball', 'house', 'book', 'food', 'tree', 'movie', 'car', 'garden', 'phone', 'friend', 'school'];
-        const adjectives = ['big', 'small', 'fast', 'slow', 'loud', 'quiet', 'happy', 'sad', 'blue', 'red', 'tall'];
-        const adverbs = ['quickly', 'slowly', 'loudly', 'softly', 'today', 'yesterday', 'always', 'never'];
-        const preps = ['in', 'on', 'at', 'under', 'over', 'by', 'next to', 'behind'];
-        const conjunctions = ['and', 'but', 'or', 'because', 'so'];
-        const timeWords = ['yesterday', 'tomorrow', 'now'];
-        const qWords = ['What', 'Where', 'Who', 'How', 'When'];
-
-        let words;
-        switch (type) {
-            case 'subject': words = subjects; break;
-            case 'verb': words = verbs; break;
-            case 'object': words = objects; break;
-            case 'adj': words = adjectives; break;
-            case 'adv': words = adverbs; break;
-            case 'prep': words = preps; break;
-            case 'conj': words = conjunctions; break;
-            case 'time': words = timeWords; break;
-            case 'qWord': words = qWords; break;
-            case 'filler': return generateRandomValidishWord(4);
-            default: return generateRandomValidishWord(5);
-        }
-        return words[Math.floor(Math.random() * words.length)].replace('_', ' ');
-    }
-
-
-    /**
-     * GENERATOR SOAL ACAL MURNI
-     * Fokus pada Struktur Bahasa Inggris, bukan Kosa Kata
-     */
-    function generateQuestions(grade, subject, level, total) {
-        let questions = [];
-        
-        // --- MATH POOL (Disesuaikan Tingkat Kesulitan) ---
-        const mathPool = {
-            easy: () => { // Kelas 1-2: Penjumlahan/Pengurangan sampai 20 (Sangat Dasar)
-                const type = Math.random() < 0.6 ? 'add' : 'sub'; // Lebih banyak Penjumlahan
-                let n1 = Math.floor(Math.random() * 10) + 1;
-                let n2 = Math.floor(Math.random() * 9) + 1; // Maksimal 10 + 9
-                
-                if (type === 'add') {
-                    return { q: `${n1} + ${n2} = ?`, a: n1 + n2, type: 'math' };
-                } else {
-                    const [max, min] = [Math.max(n1, n2), Math.min(n1, n2)];
-                    return { q: `${max} - ${min} = ?`, a: max - min, type: 'math' };
-                }
-            },
-            medium: () => { // Kelas 3-4: Perkalian/Pembagian (Tabel Dasar), Penjumlahan/Pengurangan puluhan
-                const rand = Math.random();
-                if (rand < 0.35) { // Perkalian (Tabel 2-7)
-                    let n1 = Math.floor(Math.random() * 6) + 2; // 2 sampai 7
-                    let n2 = Math.floor(Math.random() * 8) + 2; // 2 sampai 9
-                    return { q: `${n1} × ${n2} = ?`, a: n1 * n2, type: 'math' };
-                } else if (rand < 0.6) { // Pembagian (Hasil bulat)
-                    let n2 = Math.floor(Math.random() * 6) + 2;
-                    let a = Math.floor(Math.random() * 7) + 3;
-                    let n1 = n2 * a;
-                    return { q: `${n1} : ${n2} = ?`, a: a, type: 'math' };
-                } else { // Penjumlahan/Pengurangan puluhan (Lebih besar)
-                    let n1 = Math.floor(Math.random() * 70) + 30; // 30-99
-                    let n2 = Math.floor(Math.random() * 50) + 20; // 20-69
-                    const [max, min] = [Math.max(n1, n2), Math.min(n1, n2)];
-                    return { q: `${max} - ${min} = ?`, a: max - min, type: 'math' };
-                }
-            },
-            hard: () => { // Kelas 5-6: Operasi Campuran, Bilangan Bulat Negatif (Kompleks)
-                const type = Math.random();
-                
-                if (type < 0.5) { // Operasi Campuran (kali/bagi + tambah/kurang)
-                    // Contoh: 3 + 4 x 5
-                    let a = Math.floor(Math.random() * 8) + 2; 
-                    let b = Math.floor(Math.random() * 7) + 2; 
-                    let c = Math.floor(Math.random() * 15) + 5;
-                    // Pastikan urutan operasi dipahami:
-                    return { q: `${c} + ${a} × ${b} = ?`, a: c + (a * b), type: 'math' };
-                } else { // Bilangan Bulat Negatif (dengan pengurangan/penggandaan)
-                    let n1 = Math.floor(Math.random() * 20) - 10; // -10 sampai 9
-                    let n2 = Math.floor(Math.random() * 10) + 1; // 1 sampai 10
-                    const operation = Math.random() < 0.5 ? 'sub' : 'add';
-                    
-                    let q_text, result;
-                    if (operation === 'add') {
-                        result = n1 + n2;
-                        q_text = `${n1} + ${n2} = ?`;
-                    } else {
-                        result = n1 - n2;
-                        q_text = `${n1} - ${n2} = ?`;
-                    }
-                    
-                    return { q: q_text, a: result, type: 'math' };
-                }
-            }
-        };
-        
-        // --- ENGLISH POOL (Generator Tata Bahasa yang Ditingkatkan dan Bervariasi) ---
-        const englishPool = {
-            easy: () => { // Kelas 1-2: Kata Tunggal, Noun/Verb, Kata Tanya Sederhana, Artikel (A/An)
-                const type = Math.random();
-                
-                if (type < 0.25) {
-                    // Tipe 1: Identifikasi Kata Sifat (Adjective) - Kata Sifat Sederhana
-                    const adj = getRandomWordType('adj');
-                    const q = `Kata mana yang menggambarkan 'Sifat' (Adjective)?`;
-                    const distractors = [getRandomWordType('verb'), getRandomWordType('object'), getRandomWordType('prep')];
-                    return { q: q, a: adj, opts: [adj, ...distractors], type: 'en', answerType: 'adj' };
-                } else if (type < 0.50) {
-                    // Tipe 2: Kata Tanya Paling Dasar (Who, What)
-                    const qType = Math.random() < 0.5 ? 'Who' : 'What';
-                    const correctAns = qType;
-                    const q = qType === 'Who' ? `Lengkapi: ____ is your mother?` : `Lengkapi: ____ color is the sun?`;
-                    const distractors = [qType === 'Who' ? 'What' : 'Who', 'How', 'When'];
-                    return { q: q, a: correctAns, opts: [correctAns, ...distractors], type: 'en' };
-                } else if (type < 0.75) {
-                    // Tipe 3: Plural/Singular Sederhana (Is/Are)
-                    const isPlural = Math.random() < 0.5;
-                    const subject = isPlural ? 'The dogs' : 'The boy';
-                    const correctAns = isPlural ? 'are' : 'is';
-                    const q = `Pilih kata bantu yang tepat: ${subject} ____ running.`;
-                    const distractors = [isPlural ? 'is' : 'are', 'do', 'have'];
-                    return { q: q, a: correctAns, opts: [correctAns, ...distractors], type: 'en' };
-                } else {
-                    // Tipe 4: Artikel A/An
-                    const object = Math.random() < 0.5 ? 'apple' : 'cat'; // Kata vokal/konsonan
-                    const correctAns = object.match(/^[aeiou]/i) ? 'an' : 'a';
-                    const q = `Pilih artikel yang tepat: I see ____ ${object}.`;
-                    const distractors = [correctAns === 'a' ? 'an' : 'a', 'the', 'some'];
-                    return { q: q, a: correctAns, opts: [correctAns, ...distractors], type: 'en' };
-                }
-            },
-            medium: () => { // Kelas 3-4: Simple Tense (Verb S/Tidak S), Preposisi Waktu/Tempat, Kata Ganti
-                const type = Math.random();
-                
-                if (type < 0.25) {
-                    // Tipe 1: Simple Present Tense (Verb dengan -s)
-                    const verbBase = getRandomWordType('verb');
-                    const subject = 'She'; 
-                    const correctAns = `${verbBase}s`; 
-                    const q = `Lengkapi kalimat (Simple Present): ${subject} ____ (${verbBase}) the ${getRandomWordType('object')} every day.`;
-                    const distractors = [verbBase, `${verbBase}ing`, `${verbBase}ed`];
-                    return { q: q, a: correctAns, opts: [correctAns, ...distractors], type: 'en' };
-                } else if (type < 0.50) {
-                    // Tipe 2: Preposisi Waktu (at/on/in)
-                    const correctAns = Math.random() < 0.5 ? 'at' : 'on'; // at 7 o'clock / on Monday
-                    const q = correctAns === 'at' ? `Kami bangun ____ 7 o'clock.` : `Pesta diadakan ____ Saturday.`;
-                    const distractors = [correctAns === 'at' ? 'on' : 'at', 'in', 'by'];
-                    return { q: q, a: correctAns, opts: [correctAns, ...distractors], type: 'en' };
-                } else if (type < 0.75) {
-                    // Tipe 3: Kata Ganti Sederhana (He/She/They)
-                    const subjects = ['She', 'He', 'They'];
-                    const correctAns = subjects[Math.floor(Math.random() * subjects.length)];
-                    const q = `Kata ganti yang tepat untuk '${correctAns}' adalah...`;
-                    // Distraktor harus berupa kata ganti lain yang mungkin
-                    let pronoun;
-                    switch (correctAns) {
-                        case 'She': pronoun = 'He'; break;
-                        case 'He': pronoun = 'She'; break;
-                        case 'They': pronoun = 'We'; break;
-                        default: pronoun = 'It';
-                    }
-                    return { q: q, a: correctAns, opts: [correctAns, pronoun, 'I', 'You'], type: 'en' };
-                } else {
-                    // Tipe 4: Simple Past Tense Sederhana (Verb-ed / Did)
-                    const verb = 'walk';
-                    const correctAns = verb + 'ed';
-                    const q = `Bentuk kata kerja lampau (Past Tense) dari '${verb}' adalah...`;
-                    const distractors = [verb, verb + 'ing', getRandomWordType('adj')];
-                    return { q: q, a: correctAns, opts: [correctAns, ...distractors], type: 'en' };
-                }
-            },
-            hard: () => { // Kelas 5-6: Bentuk Tense Campuran, Adverb/Adjective, Konjungsi Kompleks
-                const type = Math.random();
-                
-                if (type < 0.25) {
-                    // Tipe 1: Present Continuous vs Simple Present (Pola Waktu: now vs every day)
-                    const isContinuous = Math.random() < 0.5;
-                    const verbBase = 'run';
-                    const correctAns = isContinuous ? 'is running' : 'runs';
-                    const timeClue = isContinuous ? 'now' : 'every day';
-                    const q = `Lengkapi: She ____ (${verbBase}) to school ${timeClue}.`;
-                    const distractors = [isContinuous ? 'runs' : 'is running', verbBase, 'ran'];
-                    return { q: q, a: correctAns, opts: [correctAns, ...distractors], type: 'en' };
-                } else if (type < 0.50) {
-                    // Tipe 2: Superlative Adjective (Paling)
-                    const adj = 'tall'; 
-                    const correctAns = 'tallest';
-                    const q = `Pilih bentuk perbandingan (Superlative): John is the ____ boy in the class.`;
-                    const distractors = [adj, 'taller', getRandomWordType('adv')];
-                    return { q: q, a: correctAns, opts: [correctAns, ...distractors], type: 'en' };
-                } else if (type < 0.75) {
-                    // Tipe 3: Adverb vs Adjective (quickly/quick)
-                    const verb = 'drive';
-                    const correctAns = 'carefully'; // Contoh Adverb
-                    const q = `Pilih kata yang tepat (Keterangan Cara): He drives the car ____.`;
-                    const distractors = ['careful', 'loud', 'happy']; // Contoh Adjective
-                    return { q: q, a: correctAns, opts: [correctAns, ...distractors], type: 'en' };
-                } else {
-                    // Tipe 4: Konjungsi Kompleks (But/Or/And/So) - Pilihan/Kontras
-                    const correctAns = 'but'; // Contoh statis untuk Kontras
-                    const q = `Pilih kata penghubung (Kontras): I want to go, ____ I am too busy.`;
-                    const distractors = ['and', 'or', 'so'];
-                    return { q: q, a: correctAns, opts: [correctAns, ...distractors], type: 'en' };
-                }
-            }
-        };
-
-        // Menambahkan logika untuk memastikan 10 soal unik dengan variasi dari tipe-tipe di atas
-        const subjectPool = subject === 'math' ? mathPool[level] : englishPool[level];
-        
-        // Untuk soal Bahasa Inggris, kita akan membuat 10 soal unik secara berulang dengan variasi yang tinggi
-        for (let i = 0; i < total; i++) {
-            let qObj = subjectPool(); // Panggil pool yang sesuai
-            let options = qObj.opts || [];
-
-            if (subject === 'math') {
-                // Logika distractor Math tetap sama
-                if (options.length === 0) options.push(qObj.a);
-                while (options.length < 4) {
-                    let distractor = parseInt(qObj.a) + Math.floor(Math.random() * 10) - 5;
-                    if (level === 'easy' && distractor <= 0 && parseInt(qObj.a) > 0) distractor = 1;
-                    if (!options.includes(String(distractor)) && String(distractor) !== String(qObj.a)) {
-                        options.push(String(distractor));
-                    }
-                }
-            } else { 
-                // Logika distractor English (Khusus untuk tipe soal yang tidak menyediakan opts)
-                if (options.length === 0) options.push(qObj.a);
-                    
-                if (options.length < 4) {
-                    // Generator distractor cadangan untuk memastikan 4 pilihan jika belum ada
-                    while (options.length < 4) {
-                        const distractor = getRandomWordType('filler');
-                        if (!options.includes(distractor) && distractor !== qObj.a) options.push(distractor);
-                    }
-                }
-            }
-            
-            // Soal yang dihasilkan (pastikan jawaban dan opsi berbentuk string)
-            questions.push({q: qObj.q, a: String(qObj.a), opts: shuffleArray(options.map(String))});
+      if (bank.length === 0) {
+        // fallback: tiny generator
+        for (let i=0;i<total;i++){
+          const w = getRandomWordType('filler');
+          const opts = [w, getRandomWordType('filler'), getRandomWordType('filler'), getRandomWordType('filler')];
+          questions.push({ q: `Choose the correct word: "${w}"`, a: w, opts: shuffleArray(opts) });
         }
         return questions;
-    }
+      }
 
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
+      // choose 'total' items (cycle if needed) and normalize keys
+      const pool = shuffleArray(bank.slice());
+      for (let i=0;i<total;i++){
+        const item = pool[i % pool.length];
+        const opts = item.opt || item.options || [];
+        const answer = item.a || item.answer || (opts.length>0 ? opts[0] : '');
+        // ensure at least 4 options
+        const optsCopy = opts.slice();
+        while (optsCopy.length < 4) {
+          const filler = getRandomWordType('filler');
+          if (!optsCopy.includes(filler)) optsCopy.push(filler);
         }
-        return array;
+        questions.push({ q: item.q, a: String(answer), opts: shuffleArray(optsCopy.map(String)) });
+      }
+      return questions;
     }
 
-    // Mulai Game
-    if (startBtn) {
-        startBtn.addEventListener('click', () => {
-            state.name = document.getElementById('nameInput').value.trim() || 'Anak';
-            state.age = parseInt(document.getElementById('ageInput').value) || 8;
-            state.grade = parseInt(document.getElementById('gradeSelect').value);
-            state.subject = document.getElementById('subjectSelect').value;
-            state.level = document.getElementById('levelSelect').value;
-            state.totalQ = 10; // Set kembali ke 10 soal
-            totalQuestionsNum.textContent = state.totalQ; // Update di UI
+    // default fallback: empty
+    return questions;
+  }
 
-            state.questions = generateQuestions(state.grade, state.subject, state.level, state.totalQ);
-            state.score = 0;
-            state.currentQ = 0;
-            state.timeLeft = 30; // Reset waktu
-            timerEl.textContent = state.timeLeft; // Update UI timer
+  /* =========================
+     RENDER & LOGIKA JAWAB
+  */
+  function renderQuestion(){
+    const q = state.questions[state.currentQ];
+    if (!q) return console.warn('No question found for index', state.currentQ);
+    questionText.textContent = q.q;
+    currentQuestionNum.textContent = state.currentQ + 1;
+    scoreEl.textContent = state.score;
+    progressFill.style.width = (state.currentQ / state.totalQ) * 100 + '%';
 
-            playerNameDisplay.textContent = state.name;
-            subjectDisplay.textContent = (state.subject === 'math') ? 'Matematika' : 'Bahasa Inggris';
+    answersEl.innerHTML = '';
+    q.opts.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.textContent = opt;
+      btn.onclick = () => handleAnswer(opt, q.a, btn);
+      answersEl.appendChild(btn);
+    });
 
-            mainMenu.classList.add('hidden');
-            quizView.classList.remove('hidden');
-            resultView.classList.add('hidden');
-            
-            renderQuestion();
-            // startTimer dipanggil di dalam renderQuestion
-        });
+    clearInterval(state.timerId);
+    state.timeLeft = 30;
+    timerEl.textContent = state.timeLeft;
+    startTimer();
+  }
+
+  function handleAnswer(selected, correct, btn){
+    Array.from(answersEl.children).forEach(b => b.disabled = true);
+    if (String(selected) === String(correct)) {
+      state.score += state.perQuestion;
+      if (btn) btn.classList.add('correct');
+    } else {
+      if (selected !== 'TIMEOUT') {
+        state.score -= state.wrongPenalty;
+        if (btn) btn.classList.add('incorrect');
+      }
+      Array.from(answersEl.children).forEach(b => {
+        if (String(b.textContent) === String(correct)) b.classList.add('correct-highlight');
+      });
     }
+    scoreEl.textContent = state.score;
+    setTimeout(() => {
+      state.currentQ++;
+      if (state.currentQ < state.totalQ) renderQuestion();
+      else endGame();
+    }, 1500);
+  }
 
-
-    function renderQuestion() {
-        const q = state.questions[state.currentQ];
-        questionText.textContent = q.q;
-        currentQuestionNum.textContent = state.currentQ + 1;
-        scoreEl.textContent = state.score;
-        
-        // Update progress bar
-        const pct = (state.currentQ / state.totalQ) * 100;
-        progressFill.style.width = pct + '%';
-
-        answersEl.innerHTML = '';
-        q.opts.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.textContent = opt;
-            // Pastikan penanganan klik dipasang
-            btn.onclick = () => handleAnswer(opt, q.a, btn);
-            answersEl.appendChild(btn);
-        });
-
-        // Reset timer untuk setiap soal
+  function startTimer(){
+    clearInterval(state.timerId);
+    state.timerId = setInterval(() => {
+      state.timeLeft--;
+      timerEl.textContent = state.timeLeft;
+      if (state.timeLeft <= 0) {
         clearInterval(state.timerId);
-        state.timeLeft = 30;
-        timerEl.textContent = state.timeLeft;
-        startTimer();
-    }
+        handleAnswer('TIMEOUT', state.questions[state.currentQ].a, null);
+      }
+    }, 1000);
+  }
 
-    function handleAnswer(selected, correct, buttonElement) {
-        // Disable semua tombol jawaban setelah dipilih
-        Array.from(answersEl.children).forEach(btn => btn.disabled = true);
+  function endGame(){
+    clearInterval(state.timerId);
+    if (quizView) quizView.classList.add('hidden');
+    if (resultView) resultView.classList.remove('hidden');
+    const finalScore = Math.max(0, state.score);
+    finalScoreEl.textContent = finalScore;
+    const max = state.totalQ * state.perQuestion;
+    const pct = (finalScore / max) * 100;
+    resultMessageEl.textContent = pct >= 80 ? "Luar Biasa! Kamu hebat sekali! 🏆"
+      : pct >= 50 ? "Bagus! Terus berlatih ya 👍"
+      : "Jangan menyerah! Ayo coba lagi 💪";
+    if (progressFill) progressFill.style.width = "100%";
+  }
 
-        if (String(selected) === String(correct)) {
-            state.score += state.perQuestion;
-            if(buttonElement) {
-                // Perubahan: Menggunakan classList untuk gaya yang lebih baik
-                buttonElement.classList.add('correct-answer-selected'); 
-            }
-        } else {
-            state.score -= state.wrongPenalty;
-            if(buttonElement) {
-                // Perubahan: Menggunakan classList untuk gaya yang lebih baik
-                buttonElement.classList.add('incorrect-answer-selected'); 
-            }
-            // Opsional: Tunjukkan jawaban yang benar
-            Array.from(answersEl.children).forEach(btn => {
-                if (String(btn.textContent) === String(correct)) {
-                    // Perubahan: Menandai jawaban yang benar tanpa diklik
-                    btn.classList.add('correct-answer-highlight'); 
-                }
-            });
-        }
-        scoreEl.textContent = state.score; // Update skor di UI
+  /* =========================
+     EVENT LISTENERS (START / NAV)
+  */
+  if (startBtn) {
+    startBtn.addEventListener('click', () => {
+      state.name = (nameInput && nameInput.value) ? nameInput.value.trim() : 'Anak';
+      state.age = (ageInput && ageInput.value) ? Number(ageInput.value) : 8;
+      state.grade = (gradeSelect && gradeSelect.value) ? Number(gradeSelect.value) : 1;
+      state.subject = (subjectSelect && subjectSelect.value) ? subjectSelect.value : 'math';
+      state.level = (levelSelect && levelSelect.value) ? levelSelect.value : 'easy';
 
-        setTimeout(() => {
-            state.currentQ++;
-            if (state.currentQ < state.totalQ) {
-                renderQuestion();
-            } else {
-                endGame();
-            }
-        }, 1000); // Tunggu 1 detik sebelum soal berikutnya
-    }
+      state.totalQ = 10;
+      if (totalQuestionsNum) totalQuestionsNum.textContent = state.totalQ;
 
-    function startTimer() {
+      state.questions = generateQuestions(state.grade, state.subject, state.level, state.totalQ);
+      state.score = 0;
+      state.currentQ = 0;
+      state.timeLeft = 30;
+
+      if (playerNameDisplay) playerNameDisplay.textContent = state.name;
+      if (subjectDisplay) subjectDisplay.textContent = state.subject === 'math' ? 'Matematika' : 'Bahasa Inggris';
+
+      if (mainMenu) mainMenu.classList.add('hidden');
+      if (quizView) quizView.classList.remove('hidden');
+      if (resultView) resultView.classList.add('hidden');
+
+      renderQuestion();
+    });
+  } else {
+    console.warn('startBtn tidak ditemukan; event start tidak terpasang.');
+  }
+
+  if (quitBtn) {
+    quitBtn.addEventListener('click', () => {
+      if (confirm('Yakin ingin keluar?')) {
         clearInterval(state.timerId);
-        state.timerId = setInterval(() => {
-            state.timeLeft--;
-            timerEl.textContent = state.timeLeft;
-            if (state.timeLeft <= 0) {
-                clearInterval(state.timerId);
-                // Jika waktu habis, anggap salah dan langsung ke soal berikutnya
-                handleAnswer('TIMEOUT', state.questions[state.currentQ].a, null); // Pass null for button
-            }
-        }, 1000);
-    }
+        if (mainMenu) mainMenu.classList.remove('hidden');
+        if (quizView) quizView.classList.add('hidden');
+        if (resultView) resultView.classList.add('hidden');
+      }
+    });
+  }
 
-    function endGame() {
-        clearInterval(state.timerId);
-        quizView.classList.add('hidden');
-        resultView.classList.remove('hidden');
-        
-        const finalCalculatedScore = Math.max(0, state.score); // Pastikan skor tidak minus
-        finalScoreEl.textContent = finalCalculatedScore;
-        
-        const percentage = (finalCalculatedScore / (state.totalQ * state.perQuestion)) * 100;
-        let message = '';
-        if (percentage >= 80) message = "Luar Biasa! Kamu hebat sekali! 🏆";
-        else if (percentage >= 50) message = "Bagus sekali! Terus berlatih ya! 👍";
-        else message = "Jangan menyerah! Ayo coba lagi! 💪";
-        resultMessageEl.textContent = message;
-    }
+  if (homeBtn) {
+    homeBtn.addEventListener('click', () => {
+      clearInterval(state.timerId);
+      if (mainMenu) mainMenu.classList.remove('hidden');
+      if (quizView) quizView.classList.add('hidden');
+      if (resultView) resultView.classList.add('hidden');
+    });
+  }
 
-    // Tombol Navigasi (Memeriksa keberadaan tombol sebelum melampirkan listener)
-    if (quitBtn) {
-        quitBtn.addEventListener('click', () => {
-            if (confirm('Yakin ingin keluar? Skor Anda tidak akan disimpan.')) {
-                clearInterval(state.timerId);
-                mainMenu.classList.remove('hidden');
-                quizView.classList.add('hidden');
-                resultView.classList.add('hidden');
-            }
-        });
-    }
+  if (retryBtn) retryBtn.addEventListener('click', () => startBtn && startBtn.click());
+  if (skipBtn) skipBtn.addEventListener('click', () => {
+    clearInterval(state.timerId);
+    state.currentQ++;
+    if (state.currentQ < state.totalQ) renderQuestion();
+    else endGame();
+  });
 
-    if (homeBtn) {
-        homeBtn.addEventListener('click', () => {
-            clearInterval(state.timerId);
-            mainMenu.classList.remove('hidden');
-            quizView.classList.add('hidden');
-            resultView.classList.add('hidden');
-        });
-    }
+}); // DOMContentLoaded end
 
-    if (retryBtn) {
-        retryBtn.addEventListener('click', () => {
-            // Memastikan tombol 'startBtn' ditemukan sebelum mengklik
-            const startButton = document.getElementById('startBtn');
-            if (startButton) {
-                startButton.click();
-            }
-        });
-    }
 
-    // Lewati Soal
-    if (skipBtn) {
-        skipBtn.addEventListener('click', () => {
-            clearInterval(state.timerId); // Hentikan timer soal ini
-            state.currentQ++;
-            if (state.currentQ < state.totalQ) {
-                renderQuestion();
-            } else {
-                endGame();
-            }
-        });
-    }
-});
+// ======================
+// PART B — ENGLISH QUESTIONS (KELAS 1–3)
+// ======================
+
+const englishQuestions = {
+  kelas1: {
+    mudah: [
+      { q:"What color is the sky?", opt:["Blue","Green","Black","Pink"], a:"Blue"},
+      { q:"What animal says 'meow'?", opt:["Cat","Dog","Cow","Bird"], a:"Cat"},
+      { q:"Opposite of 'big'?", opt:["Small","Tall","Long","Fast"], a:"Small"},
+      { q:"Which one is a fruit?", opt:["Apple","Shoe","Car","Book"], a:"Apple"},
+      { q:"What do we use for writing?", opt:["Pencil","Cup","Bag","Plate"], a:"Pencil"},
+      { q:"What animal can fly?", opt:["Bird","Fish","Cow","Cat"], a:"Bird"},
+      { q:"What number comes after 5?", opt:["6","4","2","10"], a:"6"},
+      { q:"Opposite of 'happy'?", opt:["Sad","Big","Hot","Cold"], a:"Sad"},
+      { q:"Which one is a shape?", opt:["Circle","Spoon","Tree","Hat"], a:"Circle"},
+      { q:"What color is grass?", opt:["Green","Blue","Red","Yellow"], a:"Green"}
+    ],
+    sedang: [
+      { q:"Where do we read books?", opt:["Library","Kitchen","Bathroom","Garage"], a:"Library"},
+      { q:"What is the opposite of 'cold'?", opt:["Hot","Wet","Blue","Light"], a:"Hot"},
+      { q:"Which one is a vehicle?", opt:["Car","Banana","Socks","Window"], a:"Car"},
+      { q:"We sleep on a…", opt:["Bed","Roof","Table","Box"], a:"Bed"},
+      { q:"Which one is a pet?", opt:["Rabbit","Rock","Spoon","Tree"], a:"Rabbit"},
+      { q:"Which is a body part?", opt:["Hand","Milk","Shoe","Ball"], a:"Hand"},
+      { q:"Opposite of 'slow'?", opt:["Fast","Tall","Happy","Round"], a:"Fast"},
+      { q:"What do we drink?", opt:["Water","Stone","Sand","Box"], a:"Water"},
+      { q:"Which one is a family member?", opt:["Mother","Chair","Sky","Spoon"], a:"Mother"},
+      { q:"Where do we cook?", opt:["Kitchen","Bed","Garden","Bathroom"], a:"Kitchen"}
+    ],
+    sulit: [
+      { q:"Which one is an action verb?", opt:["Run","Blue","Tall","Hot"], a:"Run"},
+      { q:"Where do plants grow?", opt:["Soil","Chair","Bag","Window"], a:"Soil"},
+      { q:"Opposite of 'noisy'?", opt:["Quiet","Bright","Deep","Hard"], a:"Quiet"},
+      { q:"We read with our…", opt:["Eyes","Hands","Feet","Nose"], a:"Eyes"},
+      { q:"What season is known for flowers?", opt:["Spring","Winter","Autumn","Summer"], a:"Spring"},
+      { q:"Which one means 'cepat'?", opt:["Fast","Slow","Sad","Small"], a:"Fast"},
+      { q:"'Delicious' means…", opt:["Enak","Besar","Berisik","Tinggi"], a:"Enak"},
+      { q:"Which is an animal habitat?", opt:["Forest","Pencil","Plate","Clock"], a:"Forest"},
+      { q:"Opposite of 'early'?", opt:["Late","Large","Soft","Weak"], a:"Late"},
+      { q:"Which one is a natural thing?", opt:["Sun","Toy","Phone","Chair"], a:"Sun"}
+    ]
+  },
+
+  kelas2: {
+    mudah: [
+      { q:"What animal says 'woof'?", opt:["Dog","Cat","Cow","Bird"], a:"Dog"},
+      { q:"Opposite of ‘hot’?", opt:["Cold","Small","Tall","Young"], a:"Cold"},
+      { q:"Which one is a drink?", opt:["Milk","Stone","Paper","Shoe"], a:"Milk"},
+      { q:"We write with a…", opt:["Pencil","Plate","Spoon","Rock"], a:"Pencil"},
+      { q:"Which one is a fruit?", opt:["Mango","Car","Shirt","Bag"], a:"Mango"},
+      { q:"Opposite of 'short'?", opt:["Long","Fat","Warm","Dark"], a:"Long"},
+      { q:"Which is transportation?", opt:["Bus","Tree","Eraser","Cup"], a:"Bus"},
+      { q:"Where do we brush our teeth?", opt:["Bathroom","Garden","Class","Garage"], a:"Bathroom"},
+      { q:"Which one is a job?", opt:["Teacher","Banana","Ball","Socks"], a:"Teacher"},
+      { q:"Color of banana?", opt:["Yellow","Blue","Purple","Grey"], a:"Yellow"}
+    ],
+    sedang: [
+      { q:"We eat with a…", opt:["Spoon","Book","Chair","Light"], a:"Spoon"},
+      { q:"Opposite of 'light'?", opt:["Heavy","Strong","Short","Quick"], a:"Heavy"},
+      { q:"Where do we study?", opt:["School","Market","Garage","Beach"], a:"School"},
+      { q:"Which one is a vegetable?", opt:["Carrot","Ice cream","Cake","Meat"], a:"Carrot"},
+      { q:"What do cows give?", opt:["Milk","Wool","Bread","Metal"], a:"Milk"},
+      { q:"Which one is a body part?", opt:["Leg","Bag","Ball","Box"], a:"Leg"},
+      { q:"'Kind' means…", opt:["Baik","Marah","Lapar","Basah"], a:"Baik"},
+      { q:"Opposite of 'dirty'?", opt:["Clean","Long","Short","Wide"], a:"Clean"},
+      { q:"We see with our…", opt:["Eyes","Nose","Hand","Foot"], a:"Eyes"},
+      { q:"Which one is a living thing?", opt:["Bird","Rock","Table","Cup"], a:"Bird"}
+    ],
+    sulit: [
+      { q:"Which one is a verb?", opt:["Walk","Red","Tall","Short"], a:"Walk"},
+      { q:"'Delicious' means…", opt:["Enak","Buruk","Bosan","Lemah"], a:"Enak"},
+      { q:"Where do fish live?", opt:["Water","Tree","Sky","Sand"], a:"Water"},
+      { q:"Opposite of 'brave'?", opt:["Coward","Strong","Smart","Happy"], a:"Coward"},
+      { q:"Which one is an adjective?", opt:["Beautiful","Run","Eat","Drink"], a:"Beautiful"},
+      { q:"What is a baby cat called?", opt:["Kitten","Puppy","Cub","Calf"], a:"Kitten"},
+      { q:"Opposite of 'dangerous'?", opt:["Safe","Soft","Sharp","Tall"], a:"Safe"},
+      { q:"Meaning of 'favorite'?", opt:["Kesukaan","Kebiasaan","Kebutuhan","Kelemahan"], a:"Kesukaan"},
+      { q:"Which is an indoor activity?", opt:["Reading","Swimming in the sea","Playing football","Flying a kite"], a:"Reading"},
+      { q:"We use scissors to…", opt:["Cut","Sing","Drive","Sleep"], a:"Cut"}
+    ]
+  },
+
+  kelas3: {
+    mudah: [
+      { q:"What is the opposite of ‘early’?", opt:["Late","Small","Warm","Fast"], a:"Late"},
+      { q:"What do bees make?", opt:["Honey","Milk","Bread","Oil"], a:"Honey"},
+      { q:"Which is a transport?", opt:["Train","Leaf","Spoon","Cloud"], a:"Train"},
+      { q:"Which is a verb?", opt:["Jump","Blue","Tall","Circle"], a:"Jump"},
+      { q:"Sun rises in the…", opt:["East","West","North","South"], a:"East"},
+      { q:"Opposite of ‘high’?", opt:["Low","Hot","Fast","Round"], a:"Low"},
+      { q:"We drink with a…", opt:["Glass","Bag","Book","Shoe"], a:"Glass"},
+      { q:"Which one is a job?", opt:["Doctor","Chair","Chocolate","River"], a:"Doctor"},
+      { q:"Which one is a weather?", opt:["Rainy","Spoon","Sofa","Jeans"], a:"Rainy"},
+      { q:"Opposite of ‘strong’?", opt:["Weak","Tall","Hard","Long"], a:"Weak"}
+    ],
+    sedang: [
+      { q:"Meaning of ‘protect’?", opt:["Melindungi","Melempar","Menutup","Membangun"], a:"Melindungi"},
+      { q:"Which is an adverb?", opt:["Slowly","Chair","Yellow","Cloud"], a:"Slowly"},
+      { q:"Correct sentence:", opt:["He is reading a book","He reading a book","He are reading a book","He read a book now"], a:"He is reading a book"},
+      { q:"Opposite of ‘noisy’?", opt:["Quiet","Long","Strong","Thin"], a:"Quiet"},
+      { q:"Which is a natural disaster?", opt:["Flood","Table","Pencil","Jacket"], a:"Flood"},
+      { q:"Which is a pet?", opt:["Hamster","Car","Rock","Shoes"], a:"Hamster"},
+      { q:"Meaning of ‘hungry’?", opt:["Lapar","Lelah","Takut","Marah"], a:"Lapar"},
+      { q:"Which is a preposition?", opt:["Under","Green","Run","Sweet"], a:"Under"},
+      { q:"Opposite of 'lend'?", opt:["Borrow","Buy","Catch","Stop"], a:"Borrow"},
+      { q:"Correct:", opt:["She writes neatly","She write neatly","She writing neatly","She writes neatly now"], a:"She writes neatly"}
+    ],
+    sulit: [
+      { q:"Meaning of ‘pollution’?", opt:["Pencemaran","Peningkatan","Peringatan","Peraturan"], a:"Pencemaran"},
+      { q:"Synonym of ‘angry’?", opt:["Mad","Tall","Huge","Cold"], a:"Mad"},
+      { q:"Correct passive:", opt:["The cake was made by Mila","Mila made by the cake","The cake makes Mila","Mila is made cake"], a:"The cake was made by Mila"},
+      { q:"Meaning of ‘solution’?", opt:["Solusi","Masalah","Keributan","Kesempatan"], a:"Solusi"},
+      { q:"Correct sentence:", opt:["The children were playing","The children was playing","Children were play","Children playing"], a:"The children were playing"},
+      { q:"Synonym of 'tiny'?", opt:["Small","Cold","Sharp","Wide"], a:"Small"},
+      { q:"Opposite of ‘protective’?", opt:["Dangerous","Clean","Soft","Short"], a:"Dangerous"},
+      { q:"Meaning of 'participate'?", opt:["Ikut serta","Menolak","Berjalan","Membayar"], a:"Ikut serta"},
+      { q:"Correct:", opt:["They have finished their work","They has finished their work","They finish their work now","They are finish their work"], a:"They have finished their work"},
+      { q:"Meaning of ‘growth’?", opt:["Pertumbuhan","Kehilangan","Permainan","Penjelasan"], a:"Pertumbuhan"}
+    ]
+  }
+};
+
+
+
+// ======================
+// PART C — ENGLISH QUESTIONS (KELAS 4–6)
+// ======================
+
+englishQuestions.kelas4 = {
+  mudah: [
+    { q:"Synonym of 'happy'?", opt:["Glad","Sad","Weak","Cold"], a:"Glad"},
+    { q:"What do we use to measure time?", opt:["Clock","Spoon","Paper","Chair"], a:"Clock"},
+    { q:"Opposite of 'clean'?", opt:["Dirty","Fresh","Short","Wide"], a:"Dirty"},
+    { q:"Which is a profession?", opt:["Nurse","Bottle","Window","Tiger"], a:"Nurse"},
+    { q:"Meaning of 'honest'?", opt:["Jujur","Lapar","Marah","Lelah"], a:"Jujur"},
+    { q:"Opposite of 'strong'?", opt:["Weak","Big","Hard","Tall"], a:"Weak"},
+    { q:"Which is an adverb?", opt:["Quickly","Blue","Shoe","River"], a:"Quickly"},
+    { q:"Meaning of 'warning'?", opt:["Peringatan","Pembersih","Perhiasan","Peralatan"], a:"Peringatan"},
+    { q:"Which one is an emotion?", opt:["Anger","Bottle","Sand","Flower"], a:"Anger"},
+    { q:"Opposite of 'start'?", opt:["Finish","Arrive","Short","Move"], a:"Finish"}
+  ],
+  sedang: [
+    { q:"Correct sentence:", opt:["They are doing homework","They is doing homework","They are do homework","They doing homework"], a:"They are doing homework"},
+    { q:"Meaning of 'improve'?", opt:["Meningkatkan","Menjatuhkan","Menutup","Mengurangi"], a:"Meningkatkan"},
+    { q:"Synonym of 'brave'?", opt:["Courageous","Cold","Slow","Weak"], a:"Courageous"},
+    { q:"Which is a conjunction?", opt:["Although","Quickly","Soft","Stone"], a:"Although"},
+    { q:"Meaning of 'reduce'?", opt:["Mengurangi","Membuat","Membawa","Mengangkat"], a:"Mengurangi"},
+    { q:"Which one is a preposition?", opt:["Between","Fast","Tall","Jump"], a:"Between"},
+    { q:"Meaning of 'protective'?", opt:["Pelindung","Peramal","Pertanian","Perbaikan"], a:"Pelindung"},
+    { q:"Correct sentence:", opt:["She has eaten breakfast","She have eaten breakfast","She eaten breakfast","She is eat breakfast"], a:"She has eaten breakfast"},
+    { q:"Meaning of 'natural resources'?", opt:["Sumber daya alam","Rumah tangga","Keuangan","Kesehatan"], a:"Sumber daya alam"},
+    { q:"Synonym of 'accident'?", opt:["Crash","River","Project","Growth"], a:"Crash"}
+  ],
+  sulit: [
+    { q:"Meaning of 'population'?", opt:["Populasi","Pertanyaan","Pengukuran","Pengiriman"], a:"Populasi"},
+    { q:"Correct passive voice:", opt:["The food was cooked by my mom","My mom cooked by food","The food cooks mom","Mom is cooked food"], a:"The food was cooked by my mom"},
+    { q:"Meaning of 'influence'?", opt:["Pengaruh","Kehilangan","Kebersihan","Kebiasaan"], a:"Pengaruh"},
+    { q:"Meaning of 'responsibility'?", opt:["Tanggung jawab","Kesepakatan","Peringatan","Perhiasan"], a:"Tanggung jawab"},
+    { q:"Correct:", opt:["They have been working","They has been working","They are been working","They be working"], a:"They have been working"},
+    { q:"Synonym of 'require'?", opt:["Need","Cold","Wide","Short"], a:"Need"},
+    { q:"Meaning of 'prevent'?", opt:["Mencegah","Membuka","Membuang","Membersihkan"], a:"Mencegah"},
+    { q:"Correct:", opt:["If it rains, we stay inside","If it will rain, we stay inside","If raining, we stay inside","If rain, we stay inside"], a:"If it rains, we stay inside"},
+    { q:"Meaning of 'climate change'?", opt:["Perubahan iklim","Perubahan musim","Musim kemarau","Pemanasan rumah"], a:"Perubahan iklim"},
+    { q:"Synonym of 'ability'?", opt:["Skill","Plate","Forest","Chance"], a:"Skill"}
+  ]
+};
+
+englishQuestions.kelas5 = {
+  mudah: [
+    { q:"What is the synonym of 'smart'?", opt:["Clever","Slow","Lazy","Weak"], a:"Clever"},
+    { q:"Which one is a natural disaster?", opt:["Earthquake","Pencil","Butter","Lamp"], a:"Earthquake"},
+    { q:"People travel by…", opt:["Car","Stone","Paper","Fork"], a:"Car"},
+    { q:"‘Healthy’ means…", opt:["Sehat","Mahal","Lapar","Kotor"], a:"Sehat"},
+    { q:"Opposite of 'dangerous'?", opt:["Safe","Hard","Strong","Soft"], a:"Safe"},
+    { q:"We use a thermometer to measure…", opt:["Temperature","Length","Weight","Speed"], a:"Temperature"},
+    { q:"Which is a verb?", opt:["Decide","Beautiful","Strong","Happy"], a:"Decide"},
+    { q:"Which one is a profession?", opt:["Engineer","Circle","Cloud","Music"], a:"Engineer"},
+    { q:"'Pollution' means…", opt:["Pencemaran","Pertumbuhan","Pelajaran","Pekerjaan"], a:"Pencemaran"},
+    { q:"We breathe using our…", opt:["Lungs","Feet","Hands","Ears"], a:"Lungs"}
+  ],
+  sedang: [
+    { q:"'Reduce' means…", opt:["Mengurangi","Menambah","Menghitung","Memperbesar"], a:"Mengurangi"},
+    { q:"Correct sentence:", opt:["She is cooking","She are cooking","She am cooking","She cooking"], a:"She is cooking"},
+    { q:"Synonym of 'brave'?", opt:["Courageous","Shy","Weak","Slow"], a:"Courageous"},
+    { q:"Abstract noun:", opt:["Happiness","Table","Dog","River"], a:"Happiness"},
+    { q:"'Protective gear' means…", opt:["Peralatan pelindung","Peralatan memasak","Peralatan bermain","Peralatan berkebun"], a:"Peralatan pelindung"},
+    { q:"Correct:", opt:["He doesn't like fruit","He doesn’t likes fruit","He not like fruit","He no likes fruit"], a:"He doesn't like fruit"},
+    { q:"A scientist works in a…", opt:["Laboratory","Kitchen","Bakery","Garden"], a:"Laboratory"},
+    { q:"'Rarely' means…", opt:["Jarang","Sering","Kadang","Selalu"], a:"Jarang"},
+    { q:"Which is a conjunction?", opt:["Because","Quickly","Happy","Stone"], a:"Because"},
+    { q:"‘Financial problem’ means…", opt:["Masalah keuangan","Masalah makanan","Masalah sekolah","Masalah keluarga"], a:"Masalah keuangan"}
+  ],
+  sulit: [
+    { q:"'Endangered animals' means…", opt:["Hewan yang terancam punah","Hewan peliharaan","Hewan buas","Hewan kecil"], a:"Hewan yang terancam punah"},
+    { q:"Correct:", opt:["The data is correct","The datas are correct","The datas is correct","The data are correct"], a:"The data is correct"},
+    { q:"'Consequence' means…", opt:["Akibat","Penyebab","Petunjuk","Pendapat"], a:"Akibat"},
+    { q:"Correct passive:", opt:["The letter is written by Ana","Ana writes by the letter","The letter writes Ana","Ana written the letter"], a:"The letter is written by Ana"},
+    { q:"‘He barely passed the test’ means…", opt:["Dia hampir tidak lulus","Dia lulus dengan mudah","Dia tidak lulus","Dia lulus dengan nilai tinggi"], a:"Dia hampir tidak lulus"},
+    { q:"Synonym of 'essential'?", opt:["Important","Easy","Optional","Famous"], a:"Important"},
+    { q:"Correct conditional:", opt:["If it rains, we will stay home","If it will rain, we stay home","If it raining, we will stay home","If rains, we will stay home"], a:"If it rains, we will stay home"},
+    { q:"'Available' means…", opt:["Tersedia","Tertutup","Terlarang","Tersembunyi"], a:"Tersedia"},
+    { q:"Correct question:", opt:["What are you doing?","What do you doing?","What you doing?","What doing you?"], a:"What are you doing?"},
+    { q:"'Cooperate' means…", opt:["Bekerja sama","Bertengkar","Berbohong","Berjalan"], a:"Bekerja sama"}
+  ]
+};
+
+englishQuestions.kelas6 = {
+  mudah: [
+    { q:"Synonym of 'quick'?", opt:["Fast","Late","Weak","Cold"], a:"Fast"},
+    { q:"Which is a public place?", opt:["Library","Pencil","Bottle","Spoon"], a:"Library"},
+    { q:"‘Responsibility’ means…", opt:["Tanggung jawab","Kemarahan","Kesedihan","Kebersihan"], a:"Tanggung jawab"},
+    { q:"Which is an adjective?", opt:["Tall","Jump","Sing","Drink"], a:"Tall"},
+    { q:"Opposite of 'crowded'?", opt:["Empty","Hot","Near","Short"], a:"Empty"},
+    { q:"We use a microscope to see…", opt:["Small objects","Mountains","Cars","Planets"], a:"Small objects"},
+    { q:"Correct:", opt:["She speaks English well","She speak English well","She speaking English well","She spoke English well now"], a:"She speaks English well"},
+    { q:"‘Environment’ means…", opt:["Lingkungan","Peralatan","Pekerjaan","Perhiasan"], a:"Lingkungan"},
+    { q:"Synonym of 'journey'?", opt:["Trip","Table","Flower","Paper"], a:"Trip"},
+    { q:"We write on a…", opt:["Notebook","Ruler","Eraser","Bottle"], a:"Notebook"}
+  ],
+  sedang: [
+    { q:"‘Improvement’ means…", opt:["Peningkatan","Penurunan","Kesalahan","Peringatan"], a:"Peningkatan"},
+    { q:"Correct:", opt:["They have finished the project","They has finished the project","They are finish the project","They finishing the project"], a:"They have finished the project"},
+    { q:"Which word is an adverb?", opt:["Quickly","Blue","Chair","Heavy"], a:"Quickly"},
+    { q:"‘Avoid’ means…", opt:["Menghindari","Mendekati","Membantu","Mengumpulkan"], a:"Menghindari"},
+    { q:"Choose conjunction:", opt:["Because","Beautiful","Quiet","Fast"], a:"Because"},
+    { q:"Synonym of 'ability'?", opt:["Skill","Noise","Place","Problem"], a:"Skill"},
+    { q:"Correct:", opt:["The students are studying now","The students studying now","The student are studying now","Students is studying now"], a:"The students are studying now"},
+    { q:"‘Permission’ means…", opt:["Izin","Peringatan","Tugas","Larangan"], a:"Izin"},
+    { q:"Compound word:", opt:["Raincoat","Tree","Water","Glass"], a:"Raincoat"},
+    { q:"Correct:", opt:["She rarely eats junk food","She rare eats junk food","She rarely eating junk food","She rarely eat junk food"], a:"She rarely eats junk food"}
+  ],
+  sulit: [
+    { q:"Meaning of 'sustainable development'?", opt:["Pembangunan berkelanjutan","Pembangunan cepat","Pembangunan darurat","Pembangunan sementara"], a:"Pembangunan berkelanjutan"},
+    { q:"Correct passive:", opt:["The homework was completed by Lisa","Lisa completed by the homework","The homework completes Lisa","Lisa was completing the homework"], a:"The homework was completed by Lisa"},
+    { q:"Meaning of 'significant'?", opt:["Penting","Biasa","Lama","Sementara"], a:"Penting"},
+    { q:"Correct conditional:", opt:["If I had time, I would help you","If I have time, I would help you","If I had time, I will help you","If I would have time, I help you"], a:"If I had time, I would help you"},
+    { q:"‘Contribute’ means…", opt:["Berperan / memberikan kontribusi","Berdiam diri","Berjalan","Bertengkar"], a:"Berperan / memberikan kontribusi"},
+    { q:"Correct:", opt:["The book that you gave me is very useful","The book who you gave me is very useful","The book which you give me very useful","The book what you gave is useful"], a:"The book that you gave me is very useful"},
+    { q:"Meaning of 'participation'?", opt:["Partisipasi / keikutsertaan","Peringatan","Perayaan","Perlawanan"], a:"Partisipasi / keikutsertaan"},
+    { q:"Correct form:", opt:["He has been working here for 5 years","He is been working here for 5 years","He have been working here for 5 years","He has working here for 5 years"], a:"He has been working here for 5 years"},
+    { q:"Synonym of 'challenge'?", opt:["Tantangan","Kesempatan","Kebiasaan","Perjalanan"], a:"Tantangan"},
+    { q:"Meaning of 'responsible citizen'?", opt:["Warga yang bertanggung jawab","Warga yang kaya","Warga yang sibuk","Warga yang terkenal"], a:"Warga yang bertanggung jawab"}
+  ]
+};
