@@ -4,19 +4,36 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MatlishLearning 🌸</title>
+
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body class="season-spring">
 
+  <!-- BACKSOUND CONTROL (TOMBOL MUSIK) -->
+  <div id="musicControl">
+    <button id="musicBtn">🔊 Musik ON</button>
+  </div>
+
+  <!-- BACKSOUND AUDIO -->
+  <audio id="bgMusic" loop>
+    <source src="msk.MP3" type="audio/mpeg" />
+  </audio>
+
+  <!-- Background Layer for Seasonal Themes -->
   <div id="backgroundLayer" class="background-layer"></div>
 
+  <!-- Seasonal Falling Emoji -->
   <div id="seasonal" class="seasonal"></div>
   <div id="emojiFloat" class="emoji-float"></div>
 
   <div class="container" id="app">
     
+    <!-- HEADER -->
     <header class="header">
       <h1 class="logo">Mathlist<span>Learning</span> 🎓</h1>
       
@@ -31,6 +48,7 @@
       </div>
     </header>
 
+    <!-- MAIN MENU -->
     <main class="card menu-card" id="mainMenu">
       <h2>Mulai Belajar 👋</h2>
       
@@ -73,14 +91,17 @@
         </select>
       </div>
 
+      <!-- Button Mulai Quiz -->
       <button id="startBtn" class="btn-primary">Mulai Quiz 🚀</button>
-      <p class="hint">Setiap soal bernilai 10 poin — total 10 soal (0-100). Jawaban salah mengurangi 5 poin.</p>
+      <p class="hint">Setiap soal bernilai 10 poin — total 10 soal. Jawaban salah mengurangi 5 poin.</p>
     </main>
 
+    <!-- QUIZ VIEW -->
     <section id="quizView" class="hidden">
       <div class="quiz-header">
         <div class="player-info">
-            <span id="playerNameDisplay">Nama Anak</span> | <span id="subjectDisplay">Matematika</span>
+            <span id="playerNameDisplay">Nama Anak</span> | 
+            <span id="subjectDisplay">Matematika</span>
         </div>
         <div class="timer-badge">⏳ <span id="timer">30</span>s</div>
         <div class="score-badge">Skor: <span id="score">0</span></div>
@@ -91,11 +112,13 @@
       </div>
 
       <div class="card question-card">
-        <small class="question-count-text">Soal <span id="currentQuestionNum">1</span>/<span id="totalQuestionsNum">10</span></small>
+        <small class="question-count-text">
+          Soal <span id="currentQuestionNum">1</span>/<span id="totalQuestionsNum">10</span>
+        </small>
+        
         <div class="question-text" id="questionText">Siap?</div>
         
-        <div id="answers" class="answers-grid">
-          </div>
+        <div id="answers" class="answers-grid"></div>
       </div>
       
       <div class="controls-row">
@@ -104,6 +127,7 @@
       </div>
     </section>
 
+    <!-- RESULT VIEW -->
     <section id="resultView" class="hidden card result-card">
       <h1>Selesai! 🎉</h1>
       <div class="final-score" id="finalScore">0</div>
@@ -120,6 +144,34 @@
     <small>Made with ❤️ for curious kids — DoodleLearning</small>
   </footer>
 
-  <script src="script.js"></script>
+  <!-- JAVASCRIPT -->
+  <script>
+
+    /* === BACKSOUND MUSIC === */
+    const bgMusic = document.getElementById("bgMusic");
+    const musicBtn = document.getElementById("musicBtn");
+    let musicOn = true;
+
+    window.addEventListener("load", () => {
+      bgMusic.volume = 0.3;
+      bgMusic.play().catch(() => {});
+    });
+
+    musicBtn.addEventListener("click", () => {
+      if (musicOn) {
+        bgMusic.pause();
+        musicBtn.textContent = "🔇 Musik OFF";
+        musicOn = false;
+      } else {
+        bgMusic.play();
+        musicBtn.textContent = "🔊 Musik ON";
+        musicOn = true;
+      }
+    });
+
+  </script>
+
+  <script src="script.js" defer></script>
+
 </body>
 </html>
