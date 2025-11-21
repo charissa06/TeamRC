@@ -20,7 +20,7 @@
   </div>
 
   <!-- BACKSOUND AUDIO -->
-  <audio id="backsound" loop>
+  <audio id="bgMusic" loop>
     <source src="musiksantai.mp3" type="audio/mpeg" />
   </audio>
 
@@ -148,22 +148,22 @@
   <script>
 
     /* === BACKSOUND MUSIC === */
-    const backsound = document.getElementById("backsound");
+    const bgMusic = document.getElementById("bgMusic");
     const musicBtn = document.getElementById("musicBtn");
     let musicOn = true;
 
     window.addEventListener("load", () => {
-      backsound.volume = 0.3;
-      backsound.play().catch(() => {});
+      bgMusic.volume = 0.3;
+      bgMusic.play().catch(() => {});
     });
 
     musicBtn.addEventListener("click", () => {
       if (musicOn) {
-        backsound.pause();
+        bgMusic.pause();
         musicBtn.textContent = "🔇 Musik OFF";
         musicOn = false;
       } else {
-        backsound.play();
+        bgMusic.play();
         musicBtn.textContent = "🔊 Musik ON";
         musicOn = true;
       }
