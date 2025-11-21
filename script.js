@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* =========================
      BACKSOUND MUSIK
      ========================= */
-  const bgMusic = document.getElementById('bgMusic');
+  const bgMusic = document.getElementById('backsound');
   const musicToggle = document.getElementById('musicToggle');
   let musicOn = true;
 
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-const bgm = document.getElementById("backsound");
+const bgMusic = document.getElementById("backsound");
 const toggleBtn = document.getElementById("musicToggle");
 
 toggleBtn.addEventListener("click", () => {
