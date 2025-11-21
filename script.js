@@ -1,5 +1,5 @@
 // ======================
-// PART A — LOGIKA UTAMA KUIS (letakkan di bagian atas file)
+// FULL SCRIPT (PART A + B + C) - dengan perbaikan math questions
 // ======================
 
 // Pastikan bagian B + C (englishQuestions) diletakkan setelah bagian ini.
@@ -139,23 +139,243 @@ document.addEventListener('DOMContentLoaded', () => {
   changeSeason('spring');
 
   /* =========================
-     POOL SOAL MATEMATIKA (tetap random)
+     MATH QUESTIONS (bank per kelas & level)
+     - setiap kelas (1-6) punya 3 level: mudah, sedang, sulit
+     - setiap level berisi 10 soal unik (soal & opsi)
   */
-  window.mathPoolRef = window.mathPoolRef || {
-    easy: () => {
-      const a = Math.floor(Math.random() * 10) + 1;
-      const b = Math.floor(Math.random() * 10) + 1;
-      return { q: `${a} + ${b} = ?`, a: a + b, opts: [] };
+  const mathQuestions = {
+    kelas1: {
+      mudah: [
+        { q: "2 + 3 = ?", opt:["4","5","6","3"], a:"5" },
+        { q: "1 + 4 = ?", opt:["5","2","6","4"], a:"5" },
+        { q: "5 - 2 = ?", opt:["1","2","3","4"], a:"3" },
+        { q: "3 + 1 = ?", opt:["4","5","2","6"], a:"4" },
+        { q: "4 - 1 = ?", opt:["2","3","4","1"], a:"3" },
+        { q: "0 + 6 = ?", opt:["6","5","7","4"], a:"6" },
+        { q: "2 + 2 = ?", opt:["3","4","2","5"], a:"4" },
+        { q: "6 - 3 = ?", opt:["1","2","3","4"], a:"3" },
+        { q: "1 + 1 = ?", opt:["2","1","3","0"], a:"2" },
+        { q: "3 - 1 = ?", opt:["1","2","3","4"], a:"2" }
+      ],
+      sedang: [
+        { q: "7 + 3 = ?", opt:["8","10","11","9"], a:"10" },
+        { q: "9 - 4 = ?", opt:["3","4","5","6"], a:"5" },
+        { q: "5 + 5 = ?", opt:["9","10","11","8"], a:"10" },
+        { q: "8 - 2 = ?", opt:["4","6","5","7"], a:"6" },
+        { q: "4 + 6 = ?", opt:["10","9","8","11"], a:"10" },
+        { q: "3 + 7 = ?", opt:["9","10","11","8"], a:"10" },
+        { q: "10 - 3 = ?", opt:["7","6","8","5"], a:"7" },
+        { q: "2 + 9 = ?", opt:["11","10","12","9"], a:"11" },
+        { q: "6 + 4 = ?", opt:["9","10","11","8"], a:"10" },
+        { q: "9 - 1 = ?", opt:["8","9","7","6"], a:"8" }
+      ],
+      sulit: [
+        { q: "2 × 2 = ?", opt:["4","2","6","3"], a:"4" },
+        { q: "3 × 1 = ?", opt:["3","2","4","1"], a:"3" },
+        { q: "2 × 3 = ?", opt:["5","6","4","3"], a:"6" },
+        { q: "4 × 1 = ?", opt:["4","3","2","5"], a:"4" },
+        { q: "5 + 5 - 2 = ?", opt:["7","8","9","10"], a:"8" },
+        { q: "6 - 2 + 1 = ?", opt:["3","4","5","6"], a:"5" },
+        { q: "3 + 4 = ?", opt:["6","7","8","5"], a:"7" },
+        { q: "1 + 2 + 3 = ?", opt:["6","5","7","4"], a:"6" },
+        { q: "4 + 3 = ?", opt:["7","6","8","5"], a:"7" },
+        { q: "5 - 3 = ?", opt:["2","1","3","4"], a:"2" }
+      ]
     },
-    medium: () => {
-      const a = Math.floor(Math.random() * 50) + 10;
-      const b = Math.floor(Math.random() * 10) + 1;
-      return { q: `${a} - ${b} = ?`, a: a - b, opts: [] };
+
+    kelas2: {
+      mudah: [
+        { q: "8 + 2 = ?", opt:["10","9","11","8"], a:"10" },
+        { q: "7 - 3 = ?", opt:["4","3","5","2"], a:"4" },
+        { q: "3 × 2 = ?", opt:["6","5","7","4"], a:"6" },
+        { q: "5 + 4 = ?", opt:["8","9","10","7"], a:"9" },
+        { q: "10 - 6 = ?", opt:["4","3","5","6"], a:"4" },
+        { q: "2 × 4 = ?", opt:["6","8","9","7"], a:"8" },
+        { q: "9 + 1 = ?", opt:["10","9","11","8"], a:"10" },
+        { q: "6 - 2 = ?", opt:["4","3","5","6"], a:"4" },
+        { q: "4 + 3 = ?", opt:["6","7","8","5"], a:"7" },
+        { q: "3 + 6 = ?", opt:["8","9","10","7"], a:"9" }
+      ],
+      sedang: [
+        { q: "12 - 5 = ?", opt:["7","6","8","9"], a:"7" },
+        { q: "3 × 3 = ?", opt:["6","9","8","7"], a:"9" },
+        { q: "4 × 2 = ?", opt:["6","8","9","10"], a:"8" },
+        { q: "15 - 7 = ?", opt:["8","7","9","6"], a:"8" },
+        { q: "2 × 5 = ?", opt:["10","9","8","12"], a:"10" },
+        { q: "11 - 4 = ?", opt:["6","7","8","5"], a:"7" },
+        { q: "5 + 7 = ?", opt:["11","12","13","10"], a:"12" },
+        { q: "8 + 6 = ?", opt:["14","13","12","15"], a:"14" },
+        { q: "14 - 6 = ?", opt:["8","7","9","6"], a:"8" },
+        { q: "3 × 4 = ?", opt:["12","10","11","9"], a:"12" }
+      ],
+      sulit: [
+        { q: "18 - 9 = ?", opt:["9","8","10","11"], a:"9" },
+        { q: "4 × 3 = ?", opt:["12","11","10","13"], a:"12" },
+        { q: "2 × 6 = ?", opt:["12","11","13","10"], a:"12" },
+        { q: "20 - 7 = ?", opt:["13","12","14","11"], a:"13" },
+        { q: "7 × 2 = ?", opt:["14","12","13","15"], a:"14" },
+        { q: "9 + 8 = ?", opt:["17","16","18","15"], a:"17" },
+        { q: "16 - 8 = ?", opt:["8","7","9","6"], a:"8" },
+        { q: "5 × 3 = ?", opt:["15","14","12","13"], a:"15" },
+        { q: "13 + 6 = ?", opt:["19","18","20","17"], a:"19" },
+        { q: "15 - 5 = ?", opt:["10","9","11","8"], a:"10" }
+      ]
     },
-    hard: () => {
-      const a = Math.floor(Math.random() * 12) + 1;
-      const b = Math.floor(Math.random() * 12) + 1;
-      return { q: `${a} × ${b} = ?`, a: a * b, opts: [] };
+
+    kelas3: {
+      mudah: [
+        { q: "7 × 1 = ?", opt:["7","6","8","5"], a:"7" },
+        { q: "6 + 7 = ?", opt:["13","12","14","11"], a:"13" },
+        { q: "20 - 5 = ?", opt:["15","14","16","13"], a:"15" },
+        { q: "3 × 5 = ?", opt:["15","14","13","16"], a:"15" },
+        { q: "9 + 4 = ?", opt:["13","12","14","11"], a:"13" },
+        { q: "10 - 2 = ?", opt:["8","7","9","6"], a:"8" },
+        { q: "4 × 4 = ?", opt:["16","12","14","15"], a:"16" },
+        { q: "8 + 5 = ?", opt:["13","12","14","11"], a:"13" },
+        { q: "14 - 7 = ?", opt:["7","6","8","9"], a:"7" },
+        { q: "2 × 7 = ?", opt:["14","12","13","15"], a:"14" }
+      ],
+      sedang: [
+        { q: "18 ÷ 2 = ?", opt:["9","8","10","7"], a:"9" }, // use ÷ as concept
+        { q: "5 × 5 = ?", opt:["25","20","30","15"], a:"25" },
+        { q: "11 + 9 = ?", opt:["20","19","21","18"], a:"20" },
+        { q: "21 - 9 = ?", opt:["12","11","13","10"], a:"12" },
+        { q: "3 × 6 = ?", opt:["18","16","20","15"], a:"18" },
+        { q: "24 ÷ 4 = ?", opt:["6","5","8","7"], a:"6" },
+        { q: "7 + 8 = ?", opt:["15","14","16","13"], a:"15" },
+        { q: "12 + 8 = ?", opt:["20","19","21","18"], a:"20" },
+        { q: "10 × 2 = ?", opt:["20","18","22","19"], a:"20" },
+        { q: "30 - 15 = ?", opt:["15","14","16","13"], a:"15" }
+      ],
+      sulit: [
+        { q: "9 × 3 = ?", opt:["27","26","24","28"], a:"27" },
+        { q: "36 ÷ 6 = ?", opt:["6","5","7","8"], a:"6" },
+        { q: "14 + 17 = ?", opt:["31","30","32","29"], a:"31" },
+        { q: "25 - 9 = ?", opt:["16","15","17","14"], a:"16" },
+        { q: "4 × 6 = ?", opt:["24","22","26","20"], a:"24" },
+        { q: "28 ÷ 7 = ?", opt:["4","3","5","6"], a:"4" },
+        { q: "13 + 9 = ?", opt:["22","21","23","20"], a:"22" },
+        { q: "45 - 20 = ?", opt:["25","24","26","23"], a:"25" },
+        { q: "5 × 7 = ?", opt:["35","30","33","32"], a:"35" },
+        { q: "40 ÷ 5 = ?", opt:["8","7","9","6"], a:"8" }
+      ]
+    },
+
+    kelas4: {
+      mudah: [
+        { q: "12 + 8 = ?", opt:["20","19","21","18"], a:"20" },
+        { q: "6 × 4 = ?", opt:["24","20","22","26"], a:"24" },
+        { q: "30 - 12 = ?", opt:["18","17","16","19"], a:"18" },
+        { q: "9 × 2 = ?", opt:["18","16","20","17"], a:"18" },
+        { q: "15 + 5 = ?", opt:["20","19","21","18"], a:"20" },
+        { q: "48 ÷ 6 = ?", opt:["8","7","6","9"], a:"8" },
+        { q: "7 × 3 = ?", opt:["21","20","18","19"], a:"21" },
+        { q: "22 - 9 = ?", opt:["13","12","14","11"], a:"13" },
+        { q: "11 + 11 = ?", opt:["22","21","23","20"], a:"22" },
+        { q: "5 × 6 = ?", opt:["30","25","35","28"], a:"30" }
+      ],
+      sedang: [
+        { q: "36 ÷ 9 = ?", opt:["4","3","5","6"], a:"4" },
+        { q: "14 × 2 = ?", opt:["28","26","30","24"], a:"28" },
+        { q: "45 - 18 = ?", opt:["27","26","28","25"], a:"27" },
+        { q: "9 × 5 = ?", opt:["45","40","50","35"], a:"45" },
+        { q: "27 ÷ 3 = ?", opt:["9","8","10","7"], a:"9" },
+        { q: "13 + 17 = ?", opt:["30","29","31","28"], a:"30" },
+        { q: "8 × 6 = ?", opt:["48","42","46","50"], a:"48" },
+        { q: "100 - 45 = ?", opt:["55","56","54","50"], a:"55" },
+        { q: "7 × 7 = ?", opt:["49","47","51","45"], a:"49" },
+        { q: "64 ÷ 8 = ?", opt:["8","7","9","6"], a:"8" }
+      ],
+      sulit: [
+        { q: "125 - 25 = ?", opt:["100","95","110","90"], a:"100" },
+        { q: "9 × 9 = ?", opt:["81","72","90","80"], a:"81" },
+        { q: "48 ÷ 6 = ?", opt:["8","7","9","6"], a:"8" },
+        { q: "15 × 3 = ?", opt:["45","40","42","50"], a:"45" },
+        { q: "72 ÷ 8 = ?", opt:["9","8","10","7"], a:"9" },
+        { q: "33 + 27 = ?", opt:["60","59","61","57"], a:"60" },
+        { q: "56 - 19 = ?", opt:["37","36","38","35"], a:"37" },
+        { q: "11 × 4 = ?", opt:["44","40","48","42"], a:"44" },
+        { q: "90 ÷ 9 = ?", opt:["10","9","11","8"], a:"10" },
+        { q: "25 × 2 = ?", opt:["50","45","55","40"], a:"50" }
+      ]
+    },
+
+    kelas5: {
+      mudah: [
+        { q: "120 ÷ 10 = ?", opt:["12","10","11","13"], a:"12" },
+        { q: "7 × 8 = ?", opt:["56","54","48","63"], a:"56" },
+        { q: "45 + 30 = ?", opt:["75","70","80","65"], a:"75" },
+        { q: "100 - 45 = ?", opt:["55","50","54","60"], a:"55" },
+        { q: "9 × 6 = ?", opt:["54","52","48","56"], a:"54" },
+        { q: "14 + 16 = ?", opt:["30","29","31","28"], a:"30" },
+        { q: "81 ÷ 9 = ?", opt:["9","8","10","7"], a:"9" },
+        { q: "6 × 9 = ?", opt:["54","48","60","45"], a:"54" },
+        { q: "200 - 75 = ?", opt:["125","120","115","130"], a:"125" },
+        { q: "25 + 25 = ?", opt:["50","45","55","40"], a:"50" }
+      ],
+      sedang: [
+        { q: "Find: 15 × 5 = ?", opt:["75","70","80","85"], a:"75" },
+        { q: "120 ÷ 6 = ?", opt:["20","18","22","24"], a:"20" },
+        { q: "45 × 2 = ?", opt:["90","85","95","80"], a:"90" },
+        { q: "360 ÷ 9 = ?", opt:["40","38","36","42"], a:"40" },
+        { q: "13 × 4 = ?", opt:["52","48","56","50"], a:"52" },
+        { q: "150 - 47 = ?", opt:["103","102","104","100"], a:"103" },
+        { q: "9 × 12 = ?", opt:["108","100","112","96"], a:"108" },
+        { q: "81 + 19 = ?", opt:["100","99","101","98"], a:"100" },
+        { q: "72 ÷ 8 = ?", opt:["9","8","10","7"], a:"9" },
+        { q: "17 + 23 = ?", opt:["40","39","41","38"], a:"40" }
+      ],
+      sulit: [
+        { q: "Find: 18 × 7 = ?", opt:["126","120","130","128"], a:"126" },
+        { q: "540 ÷ 6 = ?", opt:["90","80","100","85"], a:"90" },
+        { q: "125 + 375 = ?", opt:["500","490","480","505"], a:"500" },
+        { q: "250 - 88 = ?", opt:["162","160","164","158"], a:"162" },
+        { q: "14 × 11 = ?", opt:["154","144","164","150"], a:"154" },
+        { q: "360 ÷ 5 = ?", opt:["72","70","74","75"], a:"72" },
+        { q: "23 + 37 = ?", opt:["60","59","61","62"], a:"60" },
+        { q: "48 × 3 = ?", opt:["144","140","150","130"], a:"144" },
+        { q: "99 + 1 = ?", opt:["100","99","101","98"], a:"100" },
+        { q: "400 - 187 = ?", opt:["213","210","215","220"], a:"213" }
+      ]
+    },
+
+    kelas6: {
+      mudah: [
+        { q: "12 × 6 = ?", opt:["72","70","68","74"], a:"72" },
+        { q: "144 ÷ 12 = ?", opt:["12","11","13","10"], a:"12" },
+        { q: "250 + 250 = ?", opt:["500","450","550","400"], a:"500" },
+        { q: "81 - 36 = ?", opt:["45","44","46","43"], a:"45" },
+        { q: "7 × 9 = ?", opt:["63","64","60","59"], a:"63" },
+        { q: "15 × 4 = ?", opt:["60","55","65","58"], a:"60" },
+        { q: "1000 ÷ 10 = ?", opt:["100","90","110","95"], a:"100" },
+        { q: "33 + 67 = ?", opt:["100","99","101","98"], a:"100" },
+        { q: "28 × 2 = ?", opt:["56","54","58","52"], a:"56" },
+        { q: "90 - 45 = ?", opt:["45","44","46","43"], a:"45" }
+      ],
+      sedang: [
+        { q: "Find: 125 × 2 = ?", opt:["250","240","260","255"], a:"250" },
+        { q: "360 ÷ 8 = ?", opt:["45","40","50","42"], a:"45" },
+        { q: "275 + 125 = ?", opt:["400","390","410","405"], a:"400" },
+        { q: "81 ÷ 3 = ?", opt:["27","26","25","24"], a:"27" },
+        { q: "14 × 12 = ?", opt:["168","160","170","156"], a:"168" },
+        { q: "625 ÷ 25 = ?", opt:["25","24","26","20"], a:"25" },
+        { q: "48 + 52 = ?", opt:["100","99","101","98"], a:"100" },
+        { q: "210 - 75 = ?", opt:["135","130","140","125"], a:"135" },
+        { q: "9 × 14 = ?", opt:["126","120","130","124"], a:"126" },
+        { q: "144 ÷ 12 = ?", opt:["12","11","13","10"], a:"12" }
+      ],
+      sulit: [
+        { q: "Find: 27 × 6 = ?", opt:["162","160","170","152"], a:"162" },
+        { q: "720 ÷ 9 = ?", opt:["80","75","85","90"], a:"80" },
+        { q: "Find: 13 × 13 = ?", opt:["169","156","170","160"], a:"169" },
+        { q: "1000 - 379 = ?", opt:["621","620","631","600"], a:"621" },
+        { q: "45 × 4 = ?", opt:["180","170","190","175"], a:"180" },
+        { q: "900 ÷ 15 = ?", opt:["60","55","65","50"], a:"60" },
+        { q: "37 + 63 = ?", opt:["100","99","101","98"], a:"100" },
+        { q: "256 ÷ 8 = ?", opt:["32","30","28","34"], a:"32" },
+        { q: "19 × 7 = ?", opt:["133","126","140","130"], a:"133" },
+        { q: "485 + 15 = ?", opt:["500","495","505","490"], a:"500" }
+      ]
     }
   };
 
@@ -207,25 +427,81 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* =========================
-     GENERATE QUESTIONS (MATH random OR ENGLISH bank)
-     - englishQuestions must be defined in PART B/C
+     GENERATE QUESTIONS (MATH dari mathQuestions OR ENGLISH bank)
+     - englishQuestions tetap seperti PART B/C
+     - math: ambil sesuai kelas & level, pastikan 10 soal unik
   */
   function generateQuestions(grade, subject, level, total){
     const questions = [];
 
     if (subject === 'math') {
-      const pool = window.mathPoolRef[level] || window.mathPoolRef.easy;
-      for (let i=0;i<total;i++){
-        const qObj = pool();
-        let options = qObj.opts || [];
-        if (options.length === 0) options.push(String(qObj.a));
-        while (options.length < 4) {
-          let d = Number(qObj.a) + Math.floor(Math.random()*11) - 5;
-          if (!options.includes(String(d))) options.push(String(d));
+      // map level names to mathQuestions keys (user UI uses 'easy','medium','hard')
+      const lvlMap = { easy: 'mudah', medium: 'sedang', hard: 'sulit' };
+      const lvlKey = lvlMap[level] || 'mudah';
+      const kelasKey = 'kelas' + Number(grade);
+      const bank = (mathQuestions[kelasKey] && mathQuestions[kelasKey][lvlKey]) ? mathQuestions[kelasKey][lvlKey].slice() : [];
+
+      if (bank.length === 0) {
+        // fallback: create simple random arithmetic if bank kosong
+        for (let i=0;i<total;i++){
+          const a = Math.floor(Math.random()*20)+1;
+          const b = Math.floor(Math.random()*10)+1;
+          const q = `${a} + ${b} = ?`;
+          const ans = String(a + b);
+          const opts = [ans];
+          while (opts.length < 4) {
+            const d = String(Number(ans) + Math.floor(Math.random()*11) - 5);
+            if (!opts.includes(d)) opts.push(d);
+          }
+          questions.push({ q, a: ans, opts: shuffleArray(opts) });
         }
-        questions.push({ q: qObj.q, a: String(qObj.a), opts: shuffleArray(options.map(String)) });
+        return questions;
       }
-      return questions;
+
+      // ensure there are at least 'total' distinct questions by rotating bank if needed
+      // but ensure within one quiz no duplicates
+      const pickPool = [];
+      // shuffle bank to randomize selection
+      const shuffled = shuffleArray(bank.slice());
+      let idx = 0;
+      while (pickPool.length < total) {
+        const item = shuffled[idx % shuffled.length];
+        // normalize item to have q,a,opt keys
+        const opts = (item.opt || item.options || item.opt || item.opt) || item.opt || item.opts || item.opt || item.options || item.opt || item.opt || item.opt;
+        const answer = item.a || item.answer || item.ans || item.correct || (Array.isArray(item.opt) && item.opt[0]) || (Array.isArray(item.options) && item.options[0]) || '';
+        const normalizedOpts = (item.opt || item.options || item.opt || item.opts) || item.opt || item.options || item.opt || item.opt || item.opt || item.opt || item.opt;
+        // Build copy safely
+        const optsCopy = (Array.isArray(item.opt) ? item.opt.slice() : Array.isArray(item.options) ? item.options.slice() : (Array.isArray(item.opts) ? item.opts.slice() : []));
+        // if options missing, create simple distractors
+        if (optsCopy.length === 0) {
+          const numeric = /^\d+$/.test(String(answer));
+          if (numeric) {
+            optsCopy.push(String(answer));
+            while (optsCopy.length < 4) {
+              const d = String(Number(answer) + Math.floor(Math.random()*11) - 5);
+              if (!optsCopy.includes(d)) optsCopy.push(d);
+            }
+          } else {
+            // non-numeric, create fillers
+            optsCopy.push(answer || generateRandomValidishWord(4));
+            while (optsCopy.length < 4) {
+              const f = generateRandomValidishWord(4);
+              if (!optsCopy.includes(f)) optsCopy.push(f);
+            }
+          }
+        }
+        // push normalized question
+        pickPool.push({
+          q: item.q,
+          a: String(answer),
+          opts: shuffleArray(optsCopy.map(String))
+        });
+        idx++;
+        if (idx > shuffled.length * 5) break; // safety
+      }
+
+      // limit to 'total' and return
+      return pickPool.slice(0, total);
     }
 
     // ENGLISH: use englishQuestions defined in PART B/C
@@ -402,7 +678,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 }); // DOMContentLoaded end
 
-
 // ======================
 // PART B — ENGLISH QUESTIONS (KELAS 1–3)
 // ======================
@@ -526,8 +801,6 @@ const englishQuestions = {
   }
 };
 
-
-
 // ======================
 // PART C — ENGLISH QUESTIONS (KELAS 4–6)
 // ======================
@@ -565,7 +838,7 @@ englishQuestions.kelas4 = {
     { q:"Correct:", opt:["They have been working","They has been working","They are been working","They be working"], a:"They have been working"},
     { q:"Synonym of 'require'?", opt:["Need","Cold","Wide","Short"], a:"Need"},
     { q:"Meaning of 'prevent'?", opt:["Mencegah","Membuka","Membuang","Membersihkan"], a:"Mencegah"},
-    { q:"Correct:", opt:["If it rains, we stay inside","If it will rain, we stay inside","If raining, we stay inside","If rain, we stay inside"], a:"If it rains, we stay inside"},
+    { q:"Correct:", opt:["If it rains, we stay inside","If it will rain, we stay inside","If raining, we stay inside","If rain, we will stay inside"], a:"If it rains, we stay inside"},
     { q:"Meaning of 'climate change'?", opt:["Perubahan iklim","Perubahan musim","Musim kemarau","Pemanasan rumah"], a:"Perubahan iklim"},
     { q:"Synonym of 'ability'?", opt:["Skill","Plate","Forest","Chance"], a:"Skill"}
   ]
